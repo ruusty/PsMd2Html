@@ -2,8 +2,5 @@
   <Version>1.0</Version>
   <FileID>505392a6-9e58-4659-9f23-bc288d5f5e9d</FileID>
   <OpenFolders />
-  <OpenFiles>
-    <File>Test-Module.ps1</File>
-    <File>md2html.psm1</File>
-  </OpenFiles>
+  <OpenFiles />
 </ProjectState>
