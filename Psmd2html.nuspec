@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>PSmd2html</id>
+    <version>0.0.0</version>
+    <title>md2html</title>
+    <authors>Ruusty</authors>
+    <owners>Ruusty</owners>
+    <!--<licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>-->
+    <!--<projectUrl>http://example.com</projectUrl>-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>PowerShell cmdlets for...</summary>
+    <description>PowerShell cmdlets for...</description>
+    <copyright>Russell</copyright>
+    <tags> powershell admin</tags>
+  </metadata>
+  <files>
+    <file target="tools" src="tools\ChocolateyInstall.ps1" />
+    <file target="tools" src="tools\ChocolateyUninstall.ps1" />
+    <file target="tools" src="tools\properties.ps1" />
+    <file target="tools" src="tools\helpers.ps1" />
+  </files>
+</package>

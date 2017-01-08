@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="PSmd2html" default="build">
+    <description>Build file for the PSmd2html using Git</description>
+
+    <!--=============================================================================
+      Copyright : Ruusty
+
+        Project : GIS OMS
+
+    Applic Name : PSmd2html
+
+         Author : Russell
+
+           Date : 2017-01-08
+
+    ============================================================================== -->
+<script language="C#" prefix="FileUtil">
+    <references>
+            <include name="System.dll" />
+    </references>
+    <code>
+        <![CDATA[
+        //Find the filename in the current working directory (cwd) and upwards
+        [Function("FindFileUp")]
+            public static String FindFileUp(string cwd, string fileName)
+        {
+            string startPath = Path.Combine(Path.GetFullPath(cwd), fileName);
+            FileInfo file = new FileInfo(startPath);
+            while (!file.Exists) {
+                if (file.Directory.Parent == null) {
+                    return null;
+                }
+                DirectoryInfo parentDir = file.Directory.Parent;
+                file = new FileInfo(Path.Combine(parentDir.FullName, file.Name));
+            }
+            return file.FullName;
+        }
+
+]]>
+    </code>
+</script>
+
+    <property name="proj.module.name" value="md2html" /> <!-- Set the module name-->
+
+    <property name="proj.build.name" value="${path::get-file-name-without-extension(project::get-buildfile-path() )}"/>
+    <!-- Get the current working directory of the build file.  We'll use this to root every thing relative to this -->
+    <property name="proj.topdir" value="${path::get-directory-name(project::get-buildfile-path())}"/>
+    <property name="GisOms.properties.filename" value="GisOms.Chocolatey.properties.${environment::get-machine-name()}.xml"/>
+    <echo message="Config:${GisOms.properties.filename}"/>
+    <property name="GisOms.properties.path" value="${FileUtil::FindFileUp(proj.topdir,GisOms.properties.filename)}"/>
+    <if test="${GisOms.properties.path == ''}" >
+        <fail message="${GisOms.properties.filename} not found"/>
+    </if>
+    <include buildfile="${GisOms.properties.path}" unless="${property::exists('props.included')}"/>
+
+    <property name="proj.version.regex"     value="${FileUtil::FindFileUp(proj.topdir,'version.regex.xml')}"/>
+    <if test="${proj.version.regex == ''}" >
+        <fail message="version.regex.xml not found"/>
+    </if>
+    <include buildfile="${proj.version.regex}" />
+
+
+    <!-- Project config settings {-->            <!-- INSTRUCTION: Change these variable  -->
+    <property name="proj.choco.nant.build"       value="${proj.build.name+ '.Choco.build'}"/>        <!-- Chocolatey location -->
+
+    <property name="proj.Dist.Dir"               value="Dist"   />                                                                                <!-- Dist location under ${proj.topdir} -->
+    <property name="proj.Dist.path"              value="${path::combine(proj.topdir,proj.Dist.Dir)}"   />                                         <!-- Dist location absolute path under ${proj.topdir} -->
+    <property name="proj.Build.Dir"              value="Build"   />                                                                               <!-- Build location under ${proj.topdir} -->
+    <property name="proj.Build.path"             value="${path::combine(proj.topdir,proj.Build.Dir)}"   />                                        <!-- Build location absolute path under ${proj.topdir} -->
+
+
+    <property name="package.zip.name"            value="${proj.build.name+'.zip'}" />
+    <property name="package.zip.Path"            value="${path::combine (proj.Dist.path,package.zip.name)}" />
+    <property name="package.ListFname"           value="${path::combine (proj.topdir,proj.build.name+'.lis')}" />
+    <property name="package.exclude.ListFname"   value="${path::combine (proj.topdir,proj.build.name+'.exclude.lis')}" />
+
+
+
+    <property name="proj.history"            value="${proj.build.name}.history.log" />
+    <property name="proj.version.file"       value="${project::get-name()}.Build.Number" />
+
+    <!-- Project config settings }-->
+
+    <target name="build" depends="git-status,clean,git-history,version,compile,distribute,build-choco" description="Does the full build and copies the deliverable to \\COVMWNECODP1\Delivery\PSGisOmsUtils">
+        <echo message="Building ${proj.build.name}" />
+    </target>
+
+
+    <target name="version" description="Set the version">
+        <echo message="${GisOms.release.MajorMinor}" file="${proj.build.name}.Build.Number" append="false" />
+        <version buildtype="MonthDay" path="${proj.build.name}.Build.Number" prefix="AppBuildNumber" revisiontype="Automatic" startdate="${GisOms.release.StartDate}" verbose="true"/>
+    </target>
+
+
+    <target name="versionBuild" description="Version the Module Manifest and README.md ">
+        <loadfile file="${proj.version.file}"     property="AppBuildNumber.version" />
+
+        <property name="local.ModuleManifest.Path" value="${path::combine (proj.Build.path, proj.module.name + '\' + proj.module.name + '.psd1') }"/>
+        <echo message="${regex::versionmodule( local.ModuleManifest.Path, AppBuildNumber.version)}" />
+
+        <property name="local.Readme.Path" value="${path::combine (proj.Build.path,proj.module.name + '\README.md') }"/>
+        <echo message="${regex::versionreadme( local.Readme.Path, AppBuildNumber.version, DSTAMP.CHOCO.VERSION )}" />
+    </target>
+
+
+    <target name="compile" description="Build Deliverable" >
+
+        <copy todir="${proj.Build.Dir}" flatten="false" verbose="true">
+            <fileset basedir="${proj.topdir}">  <!-- INSTRUCTION: Files specification to packaging directory  -->
+                <include name="${proj.module.name}/**/*" />
+                <exclude name="**/*.html" />
+                <exclude name="**/*.credential" />
+                <exclude name="**/*.TempPoint.ps1" />
+                <exclude name="**/specification/**" />
+                <exclude name="**/tests/**" />
+                <exclude name="**/Test-Module.ps1" />
+                <exclude name="**/*.psproj" />
+                <exclude name="**/*.psprojs" />
+            </fileset>
+        </copy>
+
+        <copy todir="${proj.Build.Dir}" verbose="true">
+           <fileset basedir="${proj.topdir}" >
+             <include name="${proj.history}" />
+           </fileset>
+       </copy>
+
+       <!-- Version the Module Manifest and README.md -->
+       <call target="versionBuild" />
+
+       <exec program="powershell.exe" verbose="true"  workingdir="${proj.Build.path}">
+              <arg value='-noProfile' />
+              <arg value='-command' />
+              <arg value='"&amp;{import-module -verbose md2html; convertto-mdhtml -verbose -recurse }"' />
+        </exec>
+
+        <!-- Create a zip only file -->
+        <exec program="${tools.7zip}" workingdir="${proj.Build.Dir}" verbose="true" resultproperty="zip.result" failonerror="true">
+          <arg line=' a -tzip "${package.zip.Path}"  -ir0@"${package.ListFname}" '  />
+        </exec>
+    </target>
+
+    <target name="clean" description="Remove all generated files">
+        <delete dir="${proj.Dist.Dir}\" failonerror="false" if="${directory::exists(proj.Dist.Dir)}"/>
+        <delete dir="${proj.Build.Dir}\" failonerror="false" if="${directory::exists(proj.Build.Dir)}"/>
+        <delete verbose="true">
+            <fileset>
+                <include name="*.log"/>
+                <include name="*.html"/>
+                <exclude name="**/*.TempPoint.psm1"/>
+                <include name="${project::get-name()}.Build.Number"/>
+            </fileset>
+        </delete>
+<!--
+        <exec   program="cmd.exe" verbose="true" workingdir="${proj.topdir}\src" failonerror="true">
+            <arg line="/C" />
+            <arg line="psake.cmd" />
+            <arg line="default.ps1" />
+            <arg line="clean" />
+        </exec>
+-->
+    </target>
+
+    <target name="set-distribution-properties">
+        <loadfile file="${proj.version.file}"     property="proj.chocolateyPackageVersion" />
+        <property name="proj.chocolateyPackageName"        value="${project::get-name()}"/>
+        <property name="proj.DeliveryDir"                  value="${path::combine(core.delivery.gisoms.dir,path::combine(project::get-name(),proj.chocolateyPackageVersion))}" />
+        <property name="proj.chocolateyPackageNameVersion" value="${proj.chocolateyPackageName}.${proj.chocolateyPackageVersion}.nupkg" />
+        <call target="show-props"/>
+    </target>
+
+
+    <target name="distribute" description="Copy deliverables to the elivery Server" depends="set-distribution-properties">
+
+        <echo message="proj.DeliveryDir=${proj.DeliveryDir}" />
+        <copy todir="${proj.DeliveryDir}" verbose="true">
+            <fileset basedir="${proj.Dist.Dir}" >
+              <include name="**/*" />
+            </fileset>
+        </copy>
+        <copy todir="${proj.DeliveryDir}" verbose="true">
+            <fileset basedir="${proj.topdir}\" >
+              <include name="${proj.history}" />
+            </fileset>
+        </copy>
+    </target>
+
+
+    <target name="show-props" description="print out props" >
+        <script language="C#"  prefix="rgh" >
+            <code>
+                <![CDATA[
+                public static void ScriptMain(Project project) {
+                    project.Log(Level.Info, "Properties:");
+
+                    foreach (DictionaryEntry entry in new SortedList(project.Properties)) {
+                    if (!entry.Key.ToString().StartsWith("nant."))
+                            project.Log(Level.Info, "{0}={1}", entry.Key, entry.Value);
+                    }
+                }
+            ]]></code>
+        </script>
+    </target>
+
+
+    <target name="compile-choco" description="compile-choco" depends="set-distribution-properties,choco-pack"/>
+    <target name="build-choco" description="build-nupkg" depends="set-distribution-properties,choco-pack,choco-push"/>
+
+   <target name="set-choco-properties" description="set-choco-properties" depends="set-distribution-properties">
+            <echo message="${proj.chocolateyPackageName}"/>
+            <loadfile file="tools\properties.ps1.txt" property="local.properties">
+                <filterchain>
+                    <replacetokens>
+                        <token key="moduleName"      value="${proj.module.name}"/>
+                        <token key="PSModulePath"    value="${core.PSModulePath}"/>
+                        <token key="DeliverablesDir" value="${proj.DeliveryDir}"/>
+                        <token key="ZipName"         value="${package.zip.name}"/>
+                    </replacetokens>
+                </filterchain>
+            </loadfile>
+            <echo file="tools\properties.ps1" message="${local.properties}" />
+    </target>
+
+    <target name="choco-pack" description="Pack choco" depends="set-choco-properties" >
+        <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
+            <arg line=' pack' />
+            <arg line='${project::get-name()}.nuspec' />
+            <arg line="--version ${proj.chocolateyPackageVersion}"/>
+        </exec>
+    </target>
+
+
+    <target name="choco-test-install" depends="choco-pack" description="Tests installation" >
+        <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
+            <arg line=' install ${proj.chocolateyPackageName} -s "${proj.topdir}" -f -vd -y' />
+        </exec>
+    </target>
+
+
+    <target name="choco-test-uninstall"  description="Tests uninstall" >
+        <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
+            <arg line=' uninstall ${proj.chocolateyPackageName} -vdy' />
+        </exec>
+    </target>
+
+
+    <target name="choco-push" description="Move the package to the choco Package Feed area" depends="set-choco-properties,choco-pack">
+        <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
+            <arg line=' push "${proj.chocolateyPackageNameVersion}"' />
+            <arg line=' -s "${core.delivery.chocoFeed.dir}"' />
+            <arg line=' -dv' />
+        </exec>
+    </target>
+
+
+    <target name="show-deliverable" description="show deliverable for single batch job" depends="set-distribution-properties">
+
+        <exec
+            program='explorer.exe'
+            workingdir="${proj.topdir}"
+            failonerror="false"
+            spawn="true"
+            commandline='/e,/root,${core.delivery.chocoFeed.dir}/select,"${path::combine(core.delivery.chocoFeed.dir, proj.chocolateyPackageNameVersion)}"'
+        />
+    </target>
+
+
+
+    <target name="git-history" description="Extract git history" >
+      <property name="proj.history.since" value="2015-05-01" />
+      <echo message="
+${proj.build.name}
+========
+" file="${proj.history}" />
+      <exec program="${git.exe}" verbose="true"  workingdir="${proj.topdir}"  output="${proj.history}" append="true" >
+        <arg line= "log"/>
+        <arg line= '--since="${proj.history.since}"'/>
+        <arg line= '--pretty=format:"%h - %an, %ai : %s"' />
+      </exec>
+    </target>
+
+    <target name="git-status" description="Display Git Status">
+        <property name="local.status" value="${proj.build.name}.status.log" />
+        <delete file="${local.status}" if="${file::exists(local.status)}" />
+        <exec program="${git.exe}" verbose="true"  workingdir="${proj.topdir}" failonerror="true" output="${local.status}" >
+          <arg line= "status --short --untracked=no  --porcelain"/>
+        </exec>
+        <if test="${file::exists(local.status) and file::get-length(local.status) > 2 }">
+            <loadfile file="${local.status}" property="local.status.result" failonerror="true"/>
+            <echo message="${local.status}  ${local.status.result}" />
+            <fail message="Modified source files exist. Please commit changes. ${environment::newline()} ${local.status.result} " />
+        </if>
+    </target>
+
+<!--
+    <target name="git-revision" description="git described based revision number of the code" >
+        <property name="local.git_revision.log"     value="${proj.build.name}.git_revision.log" />
+        <property name="local.git_revision.sql"     value="${proj.build.name}.git_revision.sql" />
+        <delete file="${local.git_revision.sql}" if="${file::exists(local.git_revision.sql)}" />
+        <delete file="${local.git_revision.log}" if="${file::exists(local.git_revision.log)}" />
+        <exec program="${git.exe}" verbose="true"  workingdir="${proj.topdir}" failonerror="true" output="${local.git_revision.log}" >
+          <arg line= "describe"/>
+        </exec>
+
+        <loadfile file="${local.git_revision.log}" property="local.git_revision" failonerror="true"/>
+        <echo message="${local.git_revision.sql}  ${local.git_revision}" />
+        <echo message="define REVISION_ID=${local.git_revision}" file="${local.git_revision.sql}" verbose="true"/>
+        <echo message="define RELEASE_ID=${proj.build.name}.${AppBuildNumber.version}" file="${local.git_revision.sql}" append="true" verbose="true"/>
+    </target>
+-->
+
+
+
+
+
+
+    <target name="help" description="Help descriptions">
+        <echo message="Compiles ${proj.build.name} to a package with versioning"  />
+        <echo message='nant -buildfile:"${project::get-buildfile-path()}" -projecthelp'/>
+        <exec program="nant">
+            <arg line='-buildfile:"${project::get-buildfile-path()}" -projecthelp'/>
+        </exec>
+    </target>
+
+
+    <target name="fail">
+        <echo message="Notifying you of a failure in the build process."/>
+    </target>
+
+</project>
+

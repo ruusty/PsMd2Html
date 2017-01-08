@@ -1,0 +1,12 @@
+<#
+Generated from properties.ps1.txt
+#>
+
+$installRootDirPath    = "@PSModulePath@"
+
+$moduleName="@moduleName@" #Top filepath in zip file
+
+$DeliverablesDir = '@DeliverablesDir@'
+write-host "`$DeliverablesDir=$DeliverablesDir"
+$ZipName ="@ZipName@"
+
