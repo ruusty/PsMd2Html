@@ -224,7 +224,7 @@
     <target name="choco-pack" description="Pack choco" depends="set-choco-properties" >
         <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
             <arg line=' pack' />
-            <arg line='${project::get-name()}.nuspec' />
+            <arg line='${string::to-lower(project::get-name())}.nuspec' />
             <arg line="--version ${proj.chocolateyPackageVersion}"/>
         </exec>
     </target>

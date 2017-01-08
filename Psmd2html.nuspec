@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>PSmd2html</id>
+    <id>psmd2html</id>
     <version>0.0.0</version>
-    <title>md2html</title>
+    <title>PSmd2html</title>
     <authors>Ruusty</authors>
     <owners>Ruusty</owners>
     <!--<licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>-->
