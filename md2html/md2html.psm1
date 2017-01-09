@@ -21,8 +21,7 @@ function convertTo-mdHtml
   )
   begin
   {
-
-    $builder = [Markdig.MarkdownPipelineBuilder]::new()
+    $builder = New-Object Markdig.MarkdownPipelineBuilder
     # use UseAdvancedExtensions for better error reporting
     $pipeline = [Markdig.MarkdownExtensions]::UseAdvancedExtensions($builder).Build()
   }
