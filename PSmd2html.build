@@ -40,28 +40,31 @@
     </code>
 </script>
 
-    <property name="proj.module.name" value="md2html" /> <!-- Set the module name-->
+    <property name="proj.module.name" value="md2html" /> <!-- Set the module name  -->
 
     <property name="proj.build.name" value="${path::get-file-name-without-extension(project::get-buildfile-path() )}"/>
     <!-- Get the current working directory of the build file.  We'll use this to root every thing relative to this -->
     <property name="proj.topdir" value="${path::get-directory-name(project::get-buildfile-path())}"/>
+
     <property name="GisOms.properties.filename" value="GisOms.Chocolatey.properties.${environment::get-machine-name()}.xml"/>
-    <echo message="Config:${GisOms.properties.filename}"/>
+    <echo message="Properties Filename:${GisOms.properties.filename}"/>
     <property name="GisOms.properties.path" value="${FileUtil::FindFileUp(proj.topdir,GisOms.properties.filename)}"/>
     <if test="${GisOms.properties.path == ''}" >
         <fail message="${GisOms.properties.filename} not found"/>
     </if>
+    <echo message="Including ${GisOms.properties.path}" />
     <include buildfile="${GisOms.properties.path}" unless="${property::exists('props.included')}"/>
+
 
     <property name="proj.version.regex"     value="${FileUtil::FindFileUp(proj.topdir,'version.regex.xml')}"/>
     <if test="${proj.version.regex == ''}" >
         <fail message="version.regex.xml not found"/>
     </if>
+    <echo message="Including ${proj.version.regex}" />
     <include buildfile="${proj.version.regex}" />
 
 
-    <!-- Project config settings {-->            <!-- INSTRUCTION: Change these variable  -->
-    <property name="proj.choco.nant.build"       value="${proj.build.name+ '.Choco.build'}"/>        <!-- Chocolatey location -->
+    <!-- Project config settings {-->
 
     <property name="proj.Dist.Dir"               value="Dist"   />                                                                                <!-- Dist location under ${proj.topdir} -->
     <property name="proj.Dist.path"              value="${path::combine(proj.topdir,proj.Dist.Dir)}"   />                                         <!-- Dist location absolute path under ${proj.topdir} -->
@@ -81,18 +84,18 @@
 
     <!-- Project config settings }-->
 
-    <target name="build" depends="git-status,clean,git-history,version,compile,distribute,build-choco" description="Does the full build and copies the deliverable to \\COVMWNECODP1\Delivery\PSGisOmsUtils">
+    <target name="build" depends="git-status,clean,git-history,version,compile,distribute,build-choco" description="Does the full build and copies the deliverable to Deliverables and Chocolatey Feed">
         <echo message="Building ${proj.build.name}" />
     </target>
 
 
-    <target name="version" description="Set the version">
+    <target name="version" description="Generate the version, save in file *.Build.Number">
         <echo message="${GisOms.release.MajorMinor}" file="${proj.build.name}.Build.Number" append="false" />
         <version buildtype="MonthDay" path="${proj.build.name}.Build.Number" prefix="AppBuildNumber" revisiontype="Automatic" startdate="${GisOms.release.StartDate}" verbose="true"/>
     </target>
 
 
-    <target name="versionBuild" description="Version the Module Manifest and README.md ">
+    <target name="versionBuild" description="Version the Module Manifest (*.psd1) and README.md in Build folder">
         <loadfile file="${proj.version.file}"     property="AppBuildNumber.version" />
 
         <property name="local.ModuleManifest.Path" value="${path::combine (proj.Build.path, proj.module.name + '\' + proj.module.name + '.psd1') }"/>
@@ -103,7 +106,7 @@
     </target>
 
 
-    <target name="compile" description="Build Deliverable" >
+    <target name="compile" description="Build local zip file containing deliverables" >
 
         <copy todir="${proj.Build.Dir}" flatten="false" verbose="true">
             <fileset basedir="${proj.topdir}">  <!-- INSTRUCTION: Files specification to packaging directory  -->
@@ -170,7 +173,7 @@
     </target>
 
 
-    <target name="distribute" description="Copy deliverables to the elivery Server" depends="set-distribution-properties">
+    <target name="distribute" description="Copy deliverables to the delivery Server using version number" depends="set-distribution-properties">
 
         <echo message="proj.DeliveryDir=${proj.DeliveryDir}" />
         <copy todir="${proj.DeliveryDir}" verbose="true">
@@ -186,7 +189,7 @@
     </target>
 
 
-    <target name="show-props" description="print out props" >
+    <target name="show-props" description="Display properties" >
         <script language="C#"  prefix="rgh" >
             <code>
                 <![CDATA[
@@ -203,10 +206,10 @@
     </target>
 
 
-    <target name="compile-choco" description="compile-choco" depends="set-distribution-properties,choco-pack"/>
-    <target name="build-choco" description="build-nupkg" depends="set-distribution-properties,choco-pack,choco-push"/>
+    <target name="compile-choco" description="compile local Chocolatey *.nupkg"            depends="set-distribution-properties,choco-pack"/>
+    <target name="build-choco"   description="compile Chocolatey *.nupkg and push to Feed" depends="set-distribution-properties,choco-pack,choco-push"/>
 
-   <target name="set-choco-properties" description="set-choco-properties" depends="set-distribution-properties">
+   <target name="set-choco-properties" description="set-choco-properties in tools\properties.ps1"  depends="set-distribution-properties">
             <echo message="${proj.chocolateyPackageName}"/>
             <loadfile file="tools\properties.ps1.txt" property="local.properties">
                 <filterchain>
@@ -221,7 +224,7 @@
             <echo file="tools\properties.ps1" message="${local.properties}" />
     </target>
 
-    <target name="choco-pack" description="Pack choco" depends="set-choco-properties" >
+    <target name="choco-pack" description="Pack choco to *.nupkg" depends="set-choco-properties" >
         <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
             <arg line=' pack' />
             <arg line='${string::to-lower(project::get-name())}.nuspec' />
@@ -230,21 +233,21 @@
     </target>
 
 
-    <target name="choco-test-install" depends="choco-pack" description="Tests installation" >
+    <target name="choco-test-install" depends="choco-pack" description="Tests Chocolatey installation" >
         <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
             <arg line=' install ${proj.chocolateyPackageName} -s "${proj.topdir}" -f -vd -y' />
         </exec>
     </target>
 
 
-    <target name="choco-test-uninstall"  description="Tests uninstall" >
+    <target name="choco-test-uninstall"  description="Tests Chocolatey uninstall" >
         <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
             <arg line=' uninstall ${proj.chocolateyPackageName} -vdy' />
         </exec>
     </target>
 
 
-    <target name="choco-push" description="Move the package to the choco Package Feed area" depends="set-choco-properties,choco-pack">
+    <target name="choco-push" description="Copy the *.nupkg to the Chocolatey  Package Feed folder" depends="set-choco-properties,choco-pack">
         <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
             <arg line=' push "${proj.chocolateyPackageNameVersion}"' />
             <arg line=' -s "${core.delivery.chocoFeed.dir}"' />
@@ -255,18 +258,20 @@
 
     <target name="show-deliverable" description="show deliverable for single batch job" depends="set-distribution-properties">
 
+        <property name="WinExpArg"    value='/e,/root,${core.delivery.chocoFeed.dir}/select,"${path::combine(core.delivery.chocoFeed.dir, proj.chocolateyPackageNameVersion)}"' />
+        <echo message="${WinExpArg}" />
         <exec
             program='explorer.exe'
             workingdir="${proj.topdir}"
             failonerror="false"
             spawn="true"
-            commandline='/e,/root,${core.delivery.chocoFeed.dir}/select,"${path::combine(core.delivery.chocoFeed.dir, proj.chocolateyPackageNameVersion)}"'
+            commandline='${WinExpArg}'
         />
     </target>
 
 
 
-    <target name="git-history" description="Extract git history" >
+    <target name="git-history" description="Extract git history to file" >
       <property name="proj.history.since" value="2015-05-01" />
       <echo message="
 ${proj.build.name}
