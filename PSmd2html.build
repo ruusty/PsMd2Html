@@ -90,8 +90,15 @@
 
 
     <target name="version" description="Generate the version, save in file *.Build.Number">
-        <echo message="${GisOms.release.MajorMinor}" file="${proj.build.name}.Build.Number" append="false" />
-        <version buildtype="MonthDay" path="${proj.build.name}.Build.Number" prefix="AppBuildNumber" revisiontype="Automatic" startdate="${GisOms.release.StartDate}" verbose="true"/>
+      <echo message="${GisOms.release.MajorMinor}" file="${proj.version.file}" append="false" />
+      <version buildtype="MonthDay" path="${proj.version.file}" prefix="AppBuildNumber" revisiontype="Automatic" startdate="${GisOms.release.StartDate}" verbose="true"/>
+
+      <loadfile file="${proj.version.file}"     property="AppBuildNumber.version" />
+      <!-- Create a tag -->
+      <exec program="git.exe" verbose="true"  workingdir="${proj.topdir}"  >
+        <arg line= "tag"/>
+        <arg line= "V${AppBuildNumber.version}"/>
+      </exec>
     </target>
 
 
@@ -151,7 +158,7 @@
                 <include name="*.log"/>
                 <include name="*.html"/>
                 <exclude name="**/*.TempPoint.psm1"/>
-                <include name="${project::get-name()}.Build.Number"/>
+                <include name="${proj.version.file}"/>
             </fileset>
         </delete>
 <!--
