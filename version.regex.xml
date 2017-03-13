@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="Versioning for PowerShell Modules"  xmlns="http://nant.sf.net/release/0.85/nant.xsd"  >
+<!--
+Need to version the Module Manifest (*.psd1) properly
+
+ModuleVersion = '4.3.0.1'
+
+to
+
+ModuleVersion = '4.3.1111.5555'
+
+-->
+
+    <script language="C#" prefix="regex">
+        <references>
+                <include name="System.dll" />
+        </references>
+        <code>
+            <![CDATA[
+      [Function("versionmodule")]
+      public static string RegexVersionModule(string pFileName, string pVersion )
+      {
+         string s = "";     // string pVersion="4.3.1111.2222";
+         using (System.IO.StreamReader sr = new System.IO.StreamReader(pFileName))
+         {
+            s = @sr.ReadToEnd();
+         }
+         System.Text.RegularExpressions.RegexOptions   options = System.Text.RegularExpressions.RegexOptions.Multiline;
+         System.Text.RegularExpressions.Regex          re = new System.Text.RegularExpressions.Regex(@"(?<pre>^\s*ModuleVersion\s*=\s*')(?<ver>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?<post>'.*)", options);
+         string         replacement = String.Format("${{pre}}{0}${{post}}" ,pVersion);
+
+/*       Console.WriteLine(pFileName);
+         Console.WriteLine(pVersion);
+         Console.WriteLine(replacement);
+*/
+         s = re.Replace(@s, replacement);
+
+         using (System.IO.StreamWriter sw = new System.IO.StreamWriter(pFileName, false, System.Text.Encoding.ASCII))
+         {
+            sw.Write(s);
+         }
+         return (replacement);
+      }
+
+
+    [Function("versionreadme")]
+    public static string RegexVersionReadme(string pFileName, string pVersion ,  string pDate)
+    {
+       string s = "";     // string pVersion="01.01.01"; string pDate="15 may";
+       using (System.IO.StreamReader sr = new System.IO.StreamReader(pFileName))
+       {
+          s = @sr.ReadToEnd();
+       }
+       System.Text.RegularExpressions.RegexOptions   options = System.Text.RegularExpressions.RegexOptions.Multiline;
+       System.Text.RegularExpressions.Regex          re = new System.Text.RegularExpressions.Regex(@"(?<ver>Version: *)([0-9.]+)(?<term>[\r|\n]+)(?<date>Date: *)([\w \d\-\/\.T]*)", options);
+       string         replacement = String.Format("${{ver}}{0}${{term}}${{date}}{1}",pVersion, pDate);
+
+       //Console.WriteLine(replacement);
+       s = re.Replace(@s, replacement);
+
+
+       using (System.IO.StreamWriter sw = new System.IO.StreamWriter(pFileName, false, System.Text.Encoding.ASCII))
+       {
+          sw.Write(s);
+
+       }
+       return (replacement);
+    }
+
+]]>
+        </code>
+
+    </script>
+</project>
