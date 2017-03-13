@@ -9,3 +9,7 @@ prj/**/*
 /build
 /dist
 *.nupkg
+/*.vpj
+/*.vpw
+/*.vpwhist
+/*.vtg

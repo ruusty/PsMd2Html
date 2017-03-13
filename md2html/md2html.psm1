@@ -1,12 +1,9 @@
-﻿<#	
-	===========================================================================
-	 Created on:   	8/01/2017 16:48
-	 Created by:   	Russell
-	 Organization: 	
-	 Filename:     	md2html.psm1
-	-------------------------------------------------------------------------
-	 Module Name: md2html
-	===========================================================================
+﻿<#
+===========================================================================
+Filename: md2html.psm1
+-------------------------------------------------------------------------
+Module Name: md2html
+===========================================================================
 #>
 $ModDir = (Split-Path -parent $MyInvocation.MyCommand.Definition)
 
@@ -27,21 +24,21 @@ function convertTo-mdHtml
   }
   Process
   {
-    
+
     Write-Verbose("mdFiles:" + $mdFiles)
     Write-Verbose("Path:" + $Path)
     Write-Verbose("recurse:" + $recurse)
-    
+
     $CssFile = $ModDir + "/markdownpad-github.css"
     write-verbose ($("CssFile:" + $CssFile))
-    
+
     #for each Markdown file in the directory:
     # 1. Use MarkDig to convert the markdown to the HTML body
     # 2. Adding the CSS and in the header
     # 3. Create the file
-    
+
     $files = $mdfiles | foreach { Get-ChildItem -filter:$_ -recurse:$recurse -Path:$Path }
-    
+
     $files | foreach {
       if ($_ -ne $null -and [system.io.path]::GetExtension($_) -ine ".html")
       {
@@ -60,9 +57,6 @@ function convertTo-mdHtml
         [void]$sb.AppendLine('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
         [void]$sb.AppendLine('</head>')
         [void]$sb.AppendLine('<body>')
-        #$s = Get-Content -Raw $_.FullName
-        #$result = [Markdig.Markdown]::ToHtml($s, $pipeline);
-        #[void]$sb.AppendLine($result)
         try
         {
           [void]$sb.AppendLine($([Markdig.Markdown]::ToHtml($(Get-Content -Raw $_.FullName),$pipeline)))
@@ -74,7 +68,7 @@ function convertTo-mdHtml
         }
         [void]$sb.AppendLine('</body>')
         [void]$sb.AppendLine('</html>')
-        $sb.ToString() | out-file "$htmlFileName" -Encoding "ASCII"
+        $sb.ToString() | out-file $htmlFileName -Encoding "UTF8"
         $htmlFile = (ls $htmlFileName)
         $htmlFile.lastwritetime = $_.lastwritetime
         $htmlFile.CreationTime = $_.CreationTime

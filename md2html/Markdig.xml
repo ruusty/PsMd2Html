@@ -77,6 +77,13 @@
             Provides extension methods for <see cref="T:Markdig.MarkdownPipeline"/> to enable several Markdown extensions.
             </summary>
         </member>
+        <member name="M:Markdig.MarkdownExtensions.Use``1(Markdig.MarkdownPipelineBuilder)">
+            <summary>
+            Adds the specified extension to the extensions collection.
+            </summary>
+            <typeparam name="TExtension">The type of the extension.</typeparam>
+            <returns>The instance of <see cref="T:Markdig.MarkdownPipelineBuilder" /></returns>
+        </member>
         <member name="M:Markdig.MarkdownExtensions.UseAdvancedExtensions(Markdig.MarkdownPipelineBuilder)">
             <summary>
             Uses all extensions except the BootStrap, Emoji, SmartyPants and soft line as hard line breaks extensions.

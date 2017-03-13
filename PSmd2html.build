@@ -5,13 +5,13 @@
     <!--=============================================================================
       Copyright : Ruusty
 
-        Project : GIS OMS
+        Project :
 
     Applic Name : PSmd2html
 
-         Author : Russell
+         Author : Ruusty
 
-           Date : 2017-01-08
+           Date : 2017-03-13
 
     ============================================================================== -->
 <script language="C#" prefix="FileUtil">
@@ -79,12 +79,12 @@
 
 
 
-    <property name="proj.history"            value="${proj.build.name}.history.log" />
+    <property name="proj.history"            value="md2html\${proj.build.name}.history.log" />
     <property name="proj.version.file"       value="${project::get-name()}.Build.Number" />
 
     <!-- Project config settings }-->
 
-    <target name="build" depends="git-status,clean,git-history,version,compile,distribute,build-choco" description="Does the full build and copies the deliverable to Deliverables and Chocolatey Feed">
+    <target name="build" depends="git-status,clean,git-history,version,compile,build-choco" description="Does the full build and copies the deliverable to Deliverables and Chocolatey Feed">
         <echo message="Building ${proj.build.name}" />
     </target>
 
@@ -134,7 +134,7 @@
        <exec program="powershell.exe" verbose="true"  workingdir="${proj.Build.path}">
               <arg value='-noProfile' />
               <arg value='-command' />
-              <arg value='"&amp;{import-module -verbose md2html; convertto-mdhtml -verbose -recurse }"' />
+              <arg value='"&amp;{import-module .\md2html\md2html.psd1 -verbose; convertto-mdhtml -verbose -recurse }"' />
         </exec>
 
         <!-- Create a zip only file -->
@@ -144,24 +144,17 @@
     </target>
 
     <target name="clean" description="Remove all generated files">
-        <delete dir="${proj.Dist.Dir}\" failonerror="false" if="${directory::exists(proj.Dist.Dir)}"/>
+        <delete dir="${proj.Dist.Dir}\"  failonerror="false" if="${directory::exists(proj.Dist.Dir)}"/>
         <delete dir="${proj.Build.Dir}\" failonerror="false" if="${directory::exists(proj.Build.Dir)}"/>
-        <delete verbose="true">
-            <fileset>
-                <include name="*.log"/>
-                <include name="*.html"/>
+        <delete verbose="true" >
+            <fileset >
+                <include name="*.nupkg"/>
+                <include name="**/*.log"/>
+                <include name="**/*.html"/>
                 <exclude name="**/*.TempPoint.psm1"/>
                 <include name="${project::get-name()}.Build.Number"/>
             </fileset>
         </delete>
-<!--
-        <exec   program="cmd.exe" verbose="true" workingdir="${proj.topdir}\src" failonerror="true">
-            <arg line="/C" />
-            <arg line="psake.cmd" />
-            <arg line="default.ps1" />
-            <arg line="clean" />
-        </exec>
--->
     </target>
 
     <target name="set-distribution-properties">
@@ -170,22 +163,6 @@
         <property name="proj.DeliveryDir"                  value="${path::combine(core.delivery.gisoms.dir,path::combine(project::get-name(),proj.chocolateyPackageVersion))}" />
         <property name="proj.chocolateyPackageNameVersion" value="${proj.chocolateyPackageName}.${proj.chocolateyPackageVersion}.nupkg" />
         <call target="show-props"/>
-    </target>
-
-
-    <target name="distribute" description="Copy deliverables to the delivery Server using version number" depends="set-distribution-properties">
-
-        <echo message="proj.DeliveryDir=${proj.DeliveryDir}" />
-        <copy todir="${proj.DeliveryDir}" verbose="true">
-            <fileset basedir="${proj.Dist.Dir}" >
-              <include name="**/*" />
-            </fileset>
-        </copy>
-        <copy todir="${proj.DeliveryDir}" verbose="true">
-            <fileset basedir="${proj.topdir}\" >
-              <include name="${proj.history}" />
-            </fileset>
-        </copy>
     </target>
 
 
@@ -209,22 +186,8 @@
     <target name="compile-choco" description="compile local Chocolatey *.nupkg"            depends="set-distribution-properties,choco-pack"/>
     <target name="build-choco"   description="compile Chocolatey *.nupkg and push to Feed" depends="set-distribution-properties,choco-pack,choco-push"/>
 
-   <target name="set-choco-properties" description="set-choco-properties in tools\properties.ps1"  depends="set-distribution-properties">
-            <echo message="${proj.chocolateyPackageName}"/>
-            <loadfile file="tools\properties.ps1.txt" property="local.properties">
-                <filterchain>
-                    <replacetokens>
-                        <token key="moduleName"      value="${proj.module.name}"/>
-                        <token key="PSModulePath"    value="${core.PSModulePath}"/>
-                        <token key="DeliverablesDir" value="${proj.DeliveryDir}"/>
-                        <token key="ZipName"         value="${package.zip.name}"/>
-                    </replacetokens>
-                </filterchain>
-            </loadfile>
-            <echo file="tools\properties.ps1" message="${local.properties}" />
-    </target>
 
-    <target name="choco-pack" description="Pack choco to *.nupkg" depends="set-choco-properties" >
+    <target name="choco-pack" depends="set-distribution-properties">
         <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
             <arg line=' pack' />
             <arg line='${string::to-lower(project::get-name())}.nuspec' />
@@ -233,21 +196,17 @@
     </target>
 
 
-    <target name="choco-test-install" depends="choco-pack" description="Tests Chocolatey installation" >
-        <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
-            <arg line=' install ${proj.chocolateyPackageName} -s "${proj.topdir}" -f -vd -y' />
-        </exec>
+    <target name="choco-test-install" description="Displays Chocolatey installation command" depends="set-distribution-properties">
+     <echo message='choco install ${proj.chocolateyPackageName} -s "${proj.topdir}" -f -vd -y' />
     </target>
 
 
-    <target name="choco-test-uninstall"  description="Tests Chocolatey uninstall" >
-        <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
-            <arg line=' uninstall ${proj.chocolateyPackageName} -vdy' />
-        </exec>
+    <target name="choco-test-uninstall"  description="Displays Chocolatey uninstall command"  depends="set-distribution-properties">
+            <echo message='choco uninstall ${proj.chocolateyPackageName} -vdy' />
     </target>
 
 
-    <target name="choco-push" description="Copy the *.nupkg to the Chocolatey  Package Feed folder" depends="set-choco-properties,choco-pack">
+    <target name="choco-push" depends="choco-pack">
         <exec program="${tools.choco}"  workingdir="${proj.topdir}" verbose="true" resultproperty="choco.result" failonerror="true">
             <arg line=' push "${proj.chocolateyPackageNameVersion}"' />
             <arg line=' -s "${core.delivery.chocoFeed.dir}"' />
