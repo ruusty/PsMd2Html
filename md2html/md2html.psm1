@@ -16,14 +16,12 @@ function convertTo-mdHtml
     [String[]]$Path = $(Get-Location),
     [switch]$recurse = $false
   )
-  begin
-  {
-    $builder = New-Object Markdig.MarkdownPipelineBuilder
-    # use UseAdvancedExtensions for better error reporting
-    $pipeline = [Markdig.MarkdownExtensions]::UseAdvancedExtensions($builder).Build()
-  }
-  Process
-  {
+  #region Initialize
+  $builder = New-Object Markdig.MarkdownPipelineBuilder
+   # use UseAdvancedExtensions for better error reporting
+  $pipeline = [Markdig.MarkdownExtensions]::UseAdvancedExtensions($builder).Build()
+  #endregion Initialize
+  
 
     Write-Verbose("mdFiles:" + $mdFiles)
     Write-Verbose("Path:" + $Path)
@@ -72,13 +70,12 @@ function convertTo-mdHtml
         [void]$sb.AppendLine('</body>')
         [void]$sb.AppendLine('</html>')
         $sb.ToString() | out-file $htmlFileName -Encoding "UTF8"
-        $htmlFile = (ls $htmlFileName)
+        $htmlFile = (Get-ChildItem -Path $htmlFileName)
         $htmlFile.lastwritetime = $_.lastwritetime
         $htmlFile.CreationTime = $_.CreationTime
       }
     }
   }
-}
 
 Export-ModuleMember -Function convertTo-mdHtml
 

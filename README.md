@@ -10,6 +10,22 @@ Description:    Build the md2html Module and Chocolatey nupkg for deployment.
 
 ~~~
 
+#### Test Installation ####
 
 
 
+In an elevated Windows Console.
+
+~~~
+choco install psmd2html.4.3.6416.119.nupkg -s . -f -vd -y
+~~~
+
+
+~~~
+choco update psmd2html.4.3.6416.119.nupkg -s . -f -vd -y
+~~~
+
+
+~~~
+choco uninstall psmd2html -vdy'
+~~~

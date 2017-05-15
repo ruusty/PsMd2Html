@@ -13,3 +13,6 @@ prj/**/*
 /*.vpw
 /*.vpwhist
 /*.vtg
+*.history.txt
+PSmd2html.build
+Specification/*.xml

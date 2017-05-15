@@ -2,8 +2,8 @@
 
 
 ~~~
-Version:        1.0.0.0
-Date:           2016-01-09
+Version:        4.3.6415.8603
+Date:           2017-05-15T23-53
 ~~~
 
 md2html is a PowerShell module to automate converting Markdown into html files. 
