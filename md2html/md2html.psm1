@@ -59,7 +59,10 @@ function convertTo-mdHtml
         [void]$sb.AppendLine('<body>')
         try
         {
-          [void]$sb.AppendLine($([Markdig.Markdown]::ToHtml($(Get-Content -Raw $_.FullName),$pipeline)))
+          if ($_.Length -gt 0)
+          {
+            [void]$sb.AppendLine($([Markdig.Markdown]::ToHtml($(Get-Content -Raw $_.FullName), $pipeline)))
+          }
         }
         catch [ArgumentNullException]
         {
