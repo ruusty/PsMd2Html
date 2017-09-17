@@ -14,8 +14,8 @@ call :SetISOdatetime
 
 @set l_OutputDir=%~dp0
 @set l_log_file=%l_OutputDir%%nameStr%.%iso_datetime%.log
-@set l_OutputXmlFile= "%~dp0%l_testName%.%iso_datetime%.xml"
-@set l_OutputHtmlFile="%~dp0%l_testName%.%iso_datetime%.html"
+@set l_OutputXmlFile= "%~dp0%l_testName%.xml"
+@set l_OutputHtmlFile="%~dp0%l_testName%.html"
 
 @echo ==============================================================================={
 
@@ -34,7 +34,7 @@ set rv=%ERRORLEVEL%
 @echo.ERRORLEVEL %ERRORLEVEL%
 
 @NUnitHTMLReportGenerator.exe %l_OutputXmlFile%
-start "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" %l_OutputHtmlFile%
+@rem start "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" %l_OutputHtmlFile%
 @echo ===============================================================================}
 
 @goto :end

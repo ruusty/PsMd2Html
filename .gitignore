@@ -16,3 +16,4 @@ prj/**/*
 *.history.txt
 PSmd2html.build
 Specification/*.xml
+*.TempPoint.ps1
