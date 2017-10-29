@@ -7,7 +7,6 @@ body{
     font-family: Georgia, Palatino, serif;
     color: #444444;
     line-height: 1;
-    max-width: 960px;
     padding: 5px;
 }
 h1, h2, h3, h4 {
@@ -93,7 +92,7 @@ blockquote cite:before {
     content: '\2014 \00A0';
 }
 
-blockquote p {  
+blockquote p {
     color: #666;
     max-width: 460px;
 }

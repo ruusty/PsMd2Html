@@ -1,11 +1,23 @@
-﻿<Project>
-	<Version>2.0</Version>
-	<FileID>505392a6-9e58-4659-9f23-bc288d5f5e9d</FileID>
-	<ProjectType>1</ProjectType>
-	<Files>
-		<File Build="0">md2html.psd1</File>
-		<File Build="0">md2html.psm1</File>
-		<File Build="1">Test-Module.ps1</File>
-	</Files>
-	<StartupScript>Test-Module.ps1</StartupScript>
+﻿<Project Synchronized="False" SyncFilter="*.ps1;*.psm1;*.psd1;*.ps1xml;*.psf;*.pss;*.xml;*.help.txt">
+  <Version>2.0</Version>
+  <FileID>505392a6-9e58-4659-9f23-bc288d5f5e9d</FileID>
+  <ProjectType>1</ProjectType>
+  <Folders>
+    <Folder>Public</Folder>
+    <Folder>Specification</Folder>
+  </Folders>
+  <Files>
+    <File Build="2">md2html.psd1</File>
+    <File Build="0">md2html.psm1</File>
+    <File Build="1" Shared="False" ReferenceFunction="Invoke-Test-Module_ps1">Test-Module.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-ConvertFrom-Markdown2Html_ps1">Public\ConvertFrom-Markdown2Html.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-convertTo-mdHtml_ps1">Public\convertTo-mdHtml.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-md2html_ps1">Specification\md2html.ps1</File>
+    <File Build="2" Shared="True" ReferenceFunction="Invoke-md2html-Prev_ps1">Specification\md2html-Prev.ps1</File>
+    <File Build="2">markdown.css</File>
+    <File Build="2">markdownpad-github.css</File>
+    <File Build="2">markdownpad-github-Rusty.css</File>
+    <File Build="2">none.css</File>
+  </Files>
+  <StartupScript>R:\Projects-Ruusty\PSmd2html\md2html\Test-Module.ps1</StartupScript>
 </Project>

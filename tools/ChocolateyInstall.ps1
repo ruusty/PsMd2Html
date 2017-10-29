@@ -49,19 +49,14 @@ param(
 
     $nugetPath = $env:ChocolateyInstall
     $nugetExePath = Join-Path $nuGetPath 'bin'
-
     $packageBatchFileName = Join-Path $nugetExePath "$($cmdName).bat"
-
     Write-Host "Adding $packageBatchFileName and pointing it to powershell module $psModuleFullPath"
 "@echo off
 powershell -NoProfile -ExecutionPolicy unrestricted import-module -verbose `'$psModuleFullPath`'; convertto-mdhtml %* -verbose"| Out-File $packageBatchFileName -encoding ASCII
-
   } catch {
     throw $_.Exception
   }
 }
 
-
 Install-ChocolateyPowershellModule -packageName $env:chocolateyPackageName -psModuleFullPath $(join-path $installRootDirPath $moduleName) -cmdName "md2html"
-
 

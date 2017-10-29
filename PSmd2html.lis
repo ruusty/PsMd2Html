@@ -13,3 +13,5 @@ md2html\examples\markdown-it.demo.md
 md2html\examples\markdown-it.demo.html
 md2html\examples\github-flavored-markdown.sample_content.md
 md2html\examples\github-flavored-markdown.sample_content.html
+md2html\Public\Convert-Markdown2Html.ps1
+md2html\Public\convertTo-mdHtml.ps1

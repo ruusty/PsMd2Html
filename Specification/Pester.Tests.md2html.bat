@@ -13,6 +13,7 @@ call :SetISOdatetime
 @set l_testName=%TestName%
 
 @set l_OutputDir=%~dp0
+
 @set l_log_file=%l_OutputDir%%nameStr%.%iso_datetime%.log
 @set l_OutputXmlFile= "%~dp0%l_testName%.xml"
 @set l_OutputHtmlFile="%~dp0%l_testName%.html"
@@ -29,12 +30,11 @@ call :SetISOdatetime
 
 @echo.MSG1000[%~nx0]^>
 
-call Pester.bat -OutputFile %l_OutputXmlFile% -OutputFormat NUnitXml -testname "%l_testName%" ./md2html.Module.Tests.ps1
+call Pester.bat -OutputFile %l_OutputXmlFile% -OutputFormat NUnitXml ./md2html.Module.Tests.ps1
 set rv=%ERRORLEVEL%
 @echo.ERRORLEVEL %ERRORLEVEL%
 
 @NUnitHTMLReportGenerator.exe %l_OutputXmlFile%
-@rem start "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" %l_OutputHtmlFile%
 @echo ===============================================================================}
 
 @goto :end

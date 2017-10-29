@@ -19,7 +19,7 @@ $me = $MyInvocation.MyCommand.Definition
 filter Skip-Empty { $_ | ?{ $_ -ne $null -and $_ } }
 
 
-import-module md2html -verbose
+Import-Module "$PSScriptRoot\md2html"
 Import-Module Ruusty.ReleaseUtilities -verbose
 
 FormatTaskName "`r`n[------{0}------]`r`n"
@@ -40,6 +40,7 @@ properties {
      ,"ProjPackageZipPath"
      ,"ProjHistoryPath"
      ,"ProjVersionPath"
+     ,"ProjModulePath" 
      ,"ProjHistorySinceDate"
      ,"ProjDeliveryPath"
      ,"ProjPackageZipVersionPath"
@@ -47,9 +48,11 @@ properties {
      ,"CoreChocoFeed"
      ,"sdlc"
   )
-  $verbose = $false;
+  $verbose = $true;
   $whatif = $false;
   $now = [System.DateTime]::Now
+  $Branch = & { git symbolic-ref --short HEAD }
+  $isMaster = if ($Branch -eq 'master') { $true } else { $false }
   write-verbose($("CurrentLocation={0}" -f $executionContext.SessionState.Path.CurrentLocation))
   $GlobalPropertiesName = $("GisOms.Chocolatey.properties.{0}.xml" -f $env:COMPUTERNAME)
   $GlobalPropertiesPath = Ruusty.ReleaseUtilities\Find-FileUp $GlobalPropertiesName
@@ -58,7 +61,7 @@ properties {
   $GlobalPropertiesXML.Load($GlobalPropertiesPath)
   
   $GitExe = $GlobalPropertiesXML.SelectNodes("/project/property[@name='git.exe']").value
-  $7zipExe = $GlobalPropertiesXML.SelectNodes("/project/property[@name='tools.7zip']").value
+  $zipExe = $GlobalPropertiesXML.SelectNodes("/project/property[@name='tools.7zip']").value
   $ChocoExe = $GlobalPropertiesXML.SelectNodes("/project/property[@name='tools.choco']").value
   
   $CoreDeliveryDirectory = $GlobalPropertiesXML.SelectNodes("/project/property[@name='core.delivery.dir']").value
@@ -78,15 +81,16 @@ properties {
   
   $ProjBuildDateTime = $now.ToString("yyyy-MM-ddTHH-mm")
   
-  $ProjHistoryPath = Join-Path $ProjTopdir  "${ProjectName}.history.txt"
   $ProjVersionPath = Join-Path $ProjTopdir   "${ProjectName}.Build.Number"
+  
+  $ProjModulePath = Join-Path $ProjBuildPath "md2html"
+  $ProjHistoryPath = Join-Path $ProjModulePath  "${ProjectName}.history.txt"
+  
   $ProjHistorySinceDate = "2015-05-01"
   $ProjNuspecPath = Join-Path $ProjTopdir "${ProjectName}.nuspec"
-  $ProjNuspecPkgVersionPath = Join-Path $ProjTopdir  '${ProjectName}.${versionNum}.nupkg'
+  $ProjNuspecPkgVersionPath = Join-Path $ProjDistPath  '${ProjectName}.${versionNum}.nupkg'
 
-  
   Set-Variable -Name "sdlc" -Description "System Development Lifecycle Environment" -Value "UNKNOWN"
-  $zipExe = "7z.exe"
   $zipArgs = 'a -bb2 -tzip "{0}" -ir0@"{1}"' -f $ProjPackageZipPath, $ProjPackageListPath # Get paths from file
   #$zipArgs = 'a -bb2 -tzip "{0}" -ir0!*' -f $ProjPackageZipPath #Everything in $ProjBuildPath
   
@@ -96,22 +100,9 @@ properties {
 }
 
 task default -depends build
-task test-build -depends Show-Settings, clean, git-history, set-version, unit-test,compile, compile-nupkg, distribute
-task build -depends Show-Settings, git-status, clean, git-history, set-version, unit-test, compile, compile-nupkg, tag-version, distribute
+task test-build -depends Show-Settings,             clean, unit-test, set-version, compile, compile-nupkg
+task build      -depends Show-Settings, git-status, clean, unit-test, set-version, compile, compile-nupkg, tag-version, distribute
 
-
-task compile-nupkg -description "Compile Chocolatey nupkg from nuspec" {
-  $versionNum = Get-Content $ProjVersionPath
-  Write-Host $("Compiling {0}" -f $ProjNuspecPath)
-  exec {& $ChocoExe pack $ProjNuspecPath --version $versionNum}
-}
-
-task distribute -description "Push nupkg to Chocolatey Feed"{
-  $versionNum = Get-Content $ProjVersionPath
-  $nupkg = $ExecutionContext.InvokeCommand.ExpandString($ProjNuspecPkgVersionPath)
-  Write-Host $("Pushing {0}" -f $nupkg)
-  exec { & $ChocoExe  push $nupkg -s $CoreChocoFeed }
-}
 
 task  show-deliverable {
   $versionNum = Get-Content $ProjVersionPath
@@ -134,58 +125,64 @@ task create-dirs {
   if (!(Test-Path $ProjDistPath)) { mkdir -Path $ProjDistPath }
 }
 
-task compile -description "Build Deliverable zip file" -depends clean, git-history, create-dirs {
+task compile -description "Build Deliverable zip file" -depends clean, create-dirs {
   $versionNum = Get-Content $ProjVersionPath
   $version = [system.Version]::Parse($versionNum)
+
   $copyArgs = @{
-    path = @(
-      "$ProjTopdir\md2html\*.*"
-      ,$ProjHistoryPath
-      ,$ProjVersionPath
-     ) 
-    exclude = @("*.log", "*.html", "*.credential", "*.TempPoint.psd1", "*.TempPoint.ps1", "*.Tests.ps1","*.psproj","*.psprojs", "Test-Module.ps1")
-    destination = Join-Path $ProjBuildPath "md2html"
+    path  = @(
+      "$ProjTopdir\md2html"
+    )
+    exclude = @("*.log", "*.html", "*.credential", "*.TempPoint.psd1", "*.TempPoint.ps1", "*.Tests.ps1", "*.psproj", "*.psprojs", "Test-Module.ps1")
+    destination = $ProjBuildPath 
     recurse = $true
   }
-  if (!(Test-Path $copyArgs.destination )) { mkdir -Path $copyArgs.destination  }
   Write-Host "Attempting to get deliverables"
   Copy-Item @copyArgs -verbose:$verbose
-  Write-Host "Attempting Versioning README.md"
-  Ruusty.ReleaseUtilities\Set-VersionReadme "$($copyArgs.destination)/README.md"  $version  $now
   
-  $copyArgs.path = @("$ProjTopdir\md2html\examples\*.*"  )
-  $copyArgs.destination = Join-Path $copyArgs.destination "examples"
-  if (!(Test-Path $copyArgs.destination)) { mkdir -Path $copyArgs.destination }
-  Copy-Item @copyArgs -verbose:$verbose
+  Write-Host "Attempting to get Git History"
+  exec { & $GitExe "log"  --since="$ProjHistorySinceDate" --pretty=format:"%h - %an, %ai : %s" } | Set-Content $ProjHistoryPath
+  
+  Write-Host "Attempting Versioning README.md"
+  Ruusty.ReleaseUtilities\Set-VersionReadme "$ProjBuildPath/md2html/README.md"  $version  $now
   
   Write-Host "Attempting Versioning md2html.psd1 "
   Ruusty.ReleaseUtilities\Set-VersionModule "$ProjBuildPath/md2html/md2html.psd1"  $version
   
   Write-Host "Attempting convert markdown to html"
-  Push-Location $ProjBuildPath
-  convertto-mdhtml -verbose:$verbose -recurse
+  Convert-Markdown2Html  -path "$ProjBuildPath\*.md" -verbose:$verbose -recurse
   
   Write-Host "Attempting to create zip file with '$zipArgs'"
   Ruusty.ReleaseUtilities\Start-exe -FilePath $zipExe -ArgumentList $zipArgs -workingdirectory $ProjBuildPath
-  Pop-Location;
   
   Copy-Item "$ProjBuildPath/README.*" $ProjDistPath
   
 }
 
+task compile-nupkg -description "Compile Chocolatey nupkg from nuspec" {
+  $versionNum = Get-Content $ProjVersionPath
+  Write-Host $("Compiling {0}" -f $ProjNuspecPath)
+  exec { & $ChocoExe pack $ProjNuspecPath --version $versionNum --output-directory $ProjDistPath }
+}
 
-task clean -description "Remove all generated files" -depends clean-dirs
+task distribute -description "Push nupkg to Chocolatey Feed" -PreCondition { $isMaster } {
+  $versionNum = Get-Content $ProjVersionPath
+  $nupkg = $ExecutionContext.InvokeCommand.ExpandString($ProjNuspecPkgVersionPath)
+  Write-Host $("Pushing {0}" -f $nupkg)
+  exec { & $ChocoExe  push $nupkg -s $CoreChocoFeed }
+}
 
-task set-version -description "Create the file containing the version" {
+task clean -description "Remove generated files" -depends clean-dirs
+
+task set-version -description "Create the file containing the version" -depends create-dirs {
   $version = Ruusty.ReleaseUtilities\Get-Version -Major $($CoreMajorMinor.split('.')[0]) -Minor $($CoreMajorMinor.split('.')[1])
   Set-Content $ProjVersionPath $version.ToString()
   Write-Host $("Version:{0}" -f $(Get-Content $ProjVersionPath))
 }
 
-task tag-version -description "Create a tag with the version number" {
+task tag-version -description "Create a tag with the version number" -PreCondition { $isMaster }  {
   $versionNum = Get-Content $ProjVersionPath
   exec { & $GitExe "tag" "V$versionNum" }
-  
 }
 
 task get-version -description "Display the version" {
@@ -197,7 +194,7 @@ task git-revision -description "" {
   exec { & $GitExe "describe" --tag }
 }
 
-task git-history -description "Create git history file" {
+task git-history -description "Create git history file" -depends create-dirs {
   exec { & $GitExe "log"  --since="$ProjHistorySinceDate" --pretty=format:"%h - %an, %ai : %s" } | Set-Content $ProjHistoryPath
 }
 

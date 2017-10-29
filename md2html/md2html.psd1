@@ -14,7 +14,7 @@ Module Name: md2html
 	ModuleToProcess = 'md2html.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '1.0.0.0'
+	ModuleVersion = '2.0.0.0'
 
 	# ID used to uniquely identify this module
 	GUID = '505392a6-9e58-4659-9f23-bc288d5f5e9d'
@@ -68,10 +68,10 @@ Module Name: md2html
 
 	# Modules to import as nested modules of the module specified in
 	# ModuleToProcess
-  NestedModules = @('Markdig.dll')
+  NestedModules = @()
 
 	# Functions to export from this module
-	FunctionsToExport = 'convertTo-mdHtml' #For performanace, list functions explicity
+	#FunctionsToExport = 'convertTo-mdHtml' #For performanace, list functions explicity
 
 	# Cmdlets to export from this module
 	CmdletsToExport = '*'

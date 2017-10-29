@@ -10,23 +10,33 @@ md2html is a PowerShell module to automate converting Markdown into html files.
 
 Uses the __[Markdig](https://github.com/lunet-io/markdig)__ CommonMark compliant, extensible Markdown processor for .NET.
 
-## Usage
+## Powershell Usage
 
-
-```powershell
+~~~
 import-module md2html
-get-help convertto-mdhtml -detailed
-convertto-mdhtml -verbose -recurse
-New-Alias -Name md2html -Value convertTo-mdHtml -Description "Converts Markdown documents to html"
+$(get-module md2html).ExportedCommands.Keys |% {get-help $_ -detailed}
+~~~
+
+
+~~~
+import-module md2html
+
+get-module md2html | select -expand ExportedCommands
+$(get-module md2html).ExportedCommands.Keys
+~~~
+
+~~~
+
+New-Alias -Name md2html -Value convert-Markdown2Html -Description "Converts Markdown documents to html"
 md2html -verbose -recurse
-```
+~~~
 
 
 
 ```batch
 md2html -verbose -recurse
 ```
-## Module Commands
+#### Module Commands
 
 
 ```powershell
@@ -35,11 +45,18 @@ get-module md2html | select -expand ExportedCommands
 $(get-module md2html).ExportedCommands.Keys
 ```
 
-Get help
+#### Get help ####
 
 ```powershell
 $(get-module md2html).ExportedCommands.Keys |% {get-help $_}
 ```
+
+## Cmd Usage ##
+
+~~~
+md2html 
+
+~~~
 
 
 ## Examples ##

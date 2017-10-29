@@ -123,6 +123,11 @@
             Default (<see cref="F:Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions.AutoLink"/>)
             </summary>
         </member>
+        <member name="F:Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions.GitHub">
+            <summary>
+            Renders auto identifiers like GitHub.
+            </summary>
+        </member>
         <member name="F:Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions.AutoLink">
             <summary>
             Allows to link to a header by using the same text as the header for the link label. Default is <c>true</c>
@@ -131,6 +136,16 @@
         <member name="F:Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions.AllowOnlyAscii">
             <summary>
             Allows only ASCII characters in the url (HTML 5 allows to have UTF8 characters). Default is <c>true</c>
+            </summary>
+        </member>
+        <member name="F:Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions.KeepOpeningDigits">
+            <summary>
+            Allows to keep digits starting a heading (by default, it keeps only characters starting from the first letter)
+            </summary>
+        </member>
+        <member name="F:Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions.DiscardDots">
+            <summary>
+            Discard dots when computing an identifier.
             </summary>
         </member>
         <member name="T:Markdig.Extensions.AutoIdentifiers.HeadingLinkReferenceDefinition">
@@ -1930,6 +1945,25 @@
             Provides methods for parsing a Markdown string to a syntax tree and converting it to other formats.
             </summary>
         </member>
+        <member name="M:Markdig.Markdown.Normalize(System.String,Markdig.Renderers.Normalize.NormalizeOptions,Markdig.MarkdownPipeline)">
+            <summary>
+            Normalizes the specified markdown to a normalized markdown text.
+            </summary>
+            <param name="markdown">The markdown.</param>
+            <param name="options">The normalize options</param>
+            <param name="pipeline">The pipeline.</param>
+            <returns>A normalized markdown text.</returns>
+        </member>
+        <member name="M:Markdig.Markdown.Normalize(System.String,System.IO.TextWriter,Markdig.Renderers.Normalize.NormalizeOptions,Markdig.MarkdownPipeline)">
+            <summary>
+            Normalizes the specified markdown to a normalized markdown text.
+            </summary>
+            <param name="markdown">The markdown.</param>
+            <param name="writer">The destination <see cref="T:System.IO.TextWriter"/> that will receive the result of the conversion.</param>
+            <param name="options">The normalize options</param>
+            <param name="pipeline">The pipeline.</param>
+            <returns>A normalized markdown text.</returns>
+        </member>
         <member name="M:Markdig.Markdown.ToHtml(System.String,Markdig.MarkdownPipeline)">
             <summary>
             Converts a Markdown string to HTML.
@@ -1973,6 +2007,25 @@
             <param name="markdown">The markdown text.</param>
             <param name="pipeline">The pipeline used for the parsing.</param>
             <returns>An AST Markdown document</returns>
+            <exception cref="T:System.ArgumentNullException">if markdown variable is null</exception>
+        </member>
+        <member name="M:Markdig.Markdown.ToPlainText(System.String,System.IO.TextWriter,Markdig.MarkdownPipeline)">
+            <summary>
+            Converts a Markdown string to Plain text and output to the specified writer.
+            </summary>
+            <param name="markdown">A Markdown text.</param>
+            <param name="writer">The destination <see cref="T:System.IO.TextWriter"/> that will receive the result of the conversion.</param>
+            <param name="pipeline">The pipeline used for the conversion.</param>
+            <returns>The Markdown document that has been parsed</returns>
+            <exception cref="T:System.ArgumentNullException">if reader or writer variable are null</exception>
+        </member>
+        <member name="M:Markdig.Markdown.ToPlainText(System.String,Markdig.MarkdownPipeline)">
+            <summary>
+            Converts a Markdown string to HTML.
+            </summary>
+            <param name="markdown">A Markdown text.</param>
+            <param name="pipeline">The pipeline used for the conversion.</param>
+            <returns>The result of the conversion</returns>
             <exception cref="T:System.ArgumentNullException">if markdown variable is null</exception>
         </member>
         <member name="T:Markdig.MarkdownExtensions">
@@ -3418,10 +3471,18 @@
         </member>
         <member name="P:Markdig.Renderers.HtmlRenderer.EnableHtmlForInline">
             <summary>
-            Gets or sets a value indicating whether to ouput HTML tags when rendering. See remarks.
+            Gets or sets a value indicating whether to output HTML tags when rendering. See remarks.
             </summary>
             <remarks>
-            This is used by some renderers to disable HTML tags when rendering some inlines (for image links).
+            This is used by some renderers to disable HTML tags when rendering some inline elements (for image links).
+            </remarks>
+        </member>
+        <member name="P:Markdig.Renderers.HtmlRenderer.EnableHtmlForBlock">
+            <summary>
+            Gets or sets a value indicating whether to output HTML tags when rendering. See remarks.
+            </summary>
+            <remarks>
+            This is used by some renderers to disable HTML tags when rendering some block elements (for image links).
             </remarks>
         </member>
         <member name="P:Markdig.Renderers.HtmlRenderer.ImplicitParagraph">
@@ -3792,6 +3853,162 @@
             </summary>
             <param name="renderer">The renderer.</param>
             <param name="obj">The markdown object.</param>
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.CodeBlockRenderer">
+            <summary>
+            An Normalize renderer for a <see cref="T:Markdig.Syntax.CodeBlock"/> and <see cref="T:Markdig.Syntax.FencedCodeBlock"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.CodeBlock&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.HeadingRenderer">
+            <summary>
+            An Normalize renderer for a <see cref="T:Markdig.Syntax.HeadingBlock"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.HeadingBlock&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.AutolinkInlineRenderer">
+            <summary>
+            A Normalize renderer for an <see cref="T:Markdig.Syntax.Inlines.AutolinkInline"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.Inlines.AutolinkInline&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.CodeInlineRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.Inlines.CodeInline"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.Inlines.CodeInline&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.DelimiterInlineRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.Inlines.DelimiterInline"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.Inlines.DelimiterInline&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.EmphasisInlineRenderer">
+            <summary>
+            A Normalize renderer for an <see cref="T:Markdig.Syntax.Inlines.EmphasisInline"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.Inlines.EmphasisInline&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.LineBreakInlineRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.Inlines.LineBreakInline"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.Inlines.LineBreakInline&gt;" />
+        </member>
+        <member name="P:Markdig.Renderers.Normalize.Inlines.LineBreakInlineRenderer.RenderAsHardlineBreak">
+            <summary>
+            Gets or sets a value indicating whether to render this softline break as a Normalize hardline break tag (&lt;br /&gt;)
+            </summary>
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.LinkInlineRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.Inlines.LinkInline"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.Inlines.LinkInline&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.LiteralInlineRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.Inlines.LiteralInline"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.Inlines.LiteralInline&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.NormalizeHtmlEntityInlineRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.Inlines.HtmlEntityInline"/>.
+            </summary>
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.Inlines.NormalizeHtmlInlineRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.Inlines.HtmlInline"/>.
+            </summary>
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.ListRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.ListBlock"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.ListBlock&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.NormalizeObjectRenderer`1">
+            <summary>
+            A base class for Normalize rendering <see cref="T:Markdig.Syntax.Block"/> and <see cref="T:Markdig.Syntax.Inlines.Inline"/> Markdown objects.
+            </summary>
+            <typeparam name="TObject">The type of the object.</typeparam>
+            <seealso cref="T:Markdig.Renderers.IMarkdownObjectRenderer" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.NormalizeOptions">
+            <summary>
+            Defines the options used by <see cref="T:Markdig.Renderers.Normalize.NormalizeRenderer"/>
+            </summary>
+        </member>
+        <member name="M:Markdig.Renderers.Normalize.NormalizeOptions.#ctor">
+            <summary>
+            Initialize a new instance of <see cref="T:Markdig.Renderers.Normalize.NormalizeOptions"/>
+            </summary>
+        </member>
+        <member name="P:Markdig.Renderers.Normalize.NormalizeOptions.SpaceAfterQuoteBlock">
+            <summary>
+            Adds a space after a QuoteBlock &gt;. Default is <c>true</c>
+            </summary>
+        </member>
+        <member name="P:Markdig.Renderers.Normalize.NormalizeOptions.EmptyLineAfterCodeBlock">
+            <summary>
+            Adds an empty line after a code block (fenced and tabbed). Default is <c>true</c>
+            </summary>
+        </member>
+        <member name="P:Markdig.Renderers.Normalize.NormalizeOptions.EmptyLineAfterHeading">
+            <summary>
+            Adds an empty line after an heading. Default is <c>true</c>
+            </summary>
+        </member>
+        <member name="P:Markdig.Renderers.Normalize.NormalizeOptions.EmptyLineAfterThematicBreak">
+            <summary>
+            Adds an empty line after an thematic break. Default is <c>true</c>
+            </summary>
+        </member>
+        <member name="P:Markdig.Renderers.Normalize.NormalizeOptions.ListItemCharacter">
+            <summary>
+            The bullet character used for list items. Default is <c>null</c> leaving the original bullet character as-is.
+            </summary>
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.NormalizeRenderer">
+            <summary>
+            Default HTML renderer for a Markdown <see cref="T:Markdig.Syntax.MarkdownDocument"/> object.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.TextRendererBase&lt;Markdig.Renderers.Normalize.NormalizeRenderer&gt;" />
+        </member>
+        <member name="M:Markdig.Renderers.Normalize.NormalizeRenderer.#ctor(System.IO.TextWriter,Markdig.Renderers.Normalize.NormalizeOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Markdig.Renderers.Normalize.NormalizeRenderer"/> class.
+            </summary>
+            <param name="writer">The writer.</param>
+            <param name="options">The normalize options</param>
+        </member>
+        <member name="M:Markdig.Renderers.Normalize.NormalizeRenderer.WriteLeafRawLines(Markdig.Syntax.LeafBlock,System.Boolean,System.Boolean)">
+            <summary>
+            Writes the lines of a <see cref="T:Markdig.Syntax.LeafBlock"/>
+            </summary>
+            <param name="leafBlock">The leaf block.</param>
+            <param name="writeEndOfLines">if set to <c>true</c> write end of lines.</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.ParagraphRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.ParagraphBlock"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.ParagraphBlock&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.QuoteBlockRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.QuoteBlock"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.QuoteBlock&gt;" />
+        </member>
+        <member name="T:Markdig.Renderers.Normalize.ThematicBreakRenderer">
+            <summary>
+            A Normalize renderer for a <see cref="T:Markdig.Syntax.ThematicBreakBlock"/>.
+            </summary>
+            <seealso cref="!:Markdig.Renderers.Normalize.NormalizeObjectRenderer&lt;Markdig.Syntax.ThematicBreakBlock&gt;" />
         </member>
         <member name="T:Markdig.Renderers.ObjectRendererCollection">
             <summary>
@@ -4743,6 +4960,11 @@
         <member name="F:Markdig.Syntax.Inlines.LiteralInline.Content">
             <summary>
             The content as a <see cref="T:Markdig.Helpers.StringSlice"/>.
+            </summary>
+        </member>
+        <member name="P:Markdig.Syntax.Inlines.LiteralInline.IsFirstCharacterEscaped">
+            <summary>
+            A boolean indicating whether the first character of this literal is escaped by `\`.
             </summary>
         </member>
         <member name="T:Markdig.Syntax.LeafBlock">
