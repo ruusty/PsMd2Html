@@ -14,6 +14,7 @@
                Position = 1)]
     [Alias('PSPath')]
     [String[]]$LiteralPath = $null,
+    [Parameter(ParameterSetName = 'Path')]
     [switch]$Recurse,
     [string]$CssFile = $CssPath
   )
@@ -30,30 +31,30 @@
   # 1. Use MarkDig to convert the markdown to the HTML body
   # 2. Adding the CSS and in the header
   # 3. Create the file
-
-    Write-Verbose -Message ("ParameterSetName:{0}" -f $PsCmdlet.ParameterSetName)
-    switch ($PsCmdlet.ParameterSetName)
-    {
-      "Path"         { $ResolveArgs = @{ Path = $Path }; break }
-      "LiteralPath"  { $ResolveArgs = @{ LiteralPath = $LiteralPath }; break }
-    }
-    
-    $ResolveArgs.GetEnumerator() | Sort-Object Name | % { $_.key + " is " + $_.value } | out-string | write-verbose
-    
-    if ($Recurse)
-    {
-      $ResolveArgs += @{ recurse = $Recurse }
-    }
-    $files = Get-ChildItem @ResolveArgs -File -Exclude "*.html"
-
-  foreach ($file in $files)
+  
+  Write-Verbose -Message ("ParameterSetName:{0}" -f $PsCmdlet.ParameterSetName)
+  switch ($PsCmdlet.ParameterSetName)
   {
-    if ($file -ne $null -and [system.io.path]::GetExtension($file) -ine ".html")
+    "Path"         { $GetChildItemArgs = @{ Path = $Path }; break }
+    "LiteralPath"  { $GetChildItemArgs = @{ LiteralPath = $LiteralPath }; break }
+  }
+  
+  $GetChildItemArgs.GetEnumerator() | Sort-Object Name | % { $_.key + " is " + $_.value } | out-string | write-verbose
+  
+  if ($Recurse)
+  {
+    $GetChildItemArgs += @{ recurse = $Recurse }
+  }
+  $files = Get-ChildItem @GetChildItemArgs -File -Exclude "*.html"
+  
+  foreach ($mdfile in $files)
+  {
+    $ext = [system.io.path]::GetExtension($mdfile.fullname)
+    if ($ext -eq ".md")
     {
-      $htmlFileName = [system.io.path]::ChangeExtension($file, "html")
-      $Name = [system.io.path]::GetFileNameWithoutExtension($file)
-      $mdFile = Get-Item -Path $file
-      $cmdline = ('{0} ==> {1}' -f $file, $htmlFileName)
+      $htmlFileName = [system.io.path]::ChangeExtension($mdfile.fullname, "html")
+      $Name = [system.io.path]::GetFileNameWithoutExtension($mdfile.fullname)
+      $cmdline = ('{0} ==> {1}' -f $mdfile.fullname, $htmlFileName)
       if ($PSCmdlet.ShouldProcess(
           "$cmdline",
           "ConvertFrom-Markdown2Html"))
@@ -63,7 +64,7 @@
         [void]$sb.AppendLine('<!doctype html>')
         [void]$sb.AppendLine('<html>')
         [void]$sb.AppendLine("<!-- Generated {0} by [Markdig.Markdown]::ToHtml -->" -f $([System.DateTime]::Now))
-        [void]$sb.AppendLine("<!-- Generated from {0} -->" -f $file)
+        [void]$sb.AppendLine("<!-- Generated from {0} -->" -f $mdfile.fullname)
         [void]$sb.AppendLine("<head>")
         [void]$sb.AppendLine('<meta charset="utf-8">')
         [void]$sb.AppendLine('<meta http-equiv="x-ua-compatible" content="ie=edge">')
@@ -74,9 +75,9 @@
         [void]$sb.AppendLine('<body>')
         try
         {
-          if ((Get-Item -Path $file).Length -gt 0)
+          if ($mdfile.Length -gt 0)
           {
-            [void]$sb.AppendLine($([Markdig.Markdown]::ToHtml($(Get-Content -Raw $file), $pipeline)))
+            [void]$sb.AppendLine($([Markdig.Markdown]::ToHtml($(Get-Content -Raw $mdfile.fullname), $pipeline)))
           }
         }
         catch [ArgumentNullException]
