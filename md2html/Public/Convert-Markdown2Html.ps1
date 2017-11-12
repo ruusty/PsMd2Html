@@ -5,12 +5,12 @@
   param
   (
     [Parameter(ParameterSetName = 'Path',
+               ValueFromPipeline = $true,
                Position = 1)]
     [SupportsWildcards()]
     [string[]]$Path = "*.md",
     [Parameter(ParameterSetName = 'LiteralPath',
                Mandatory = $true,
-               ValueFromPipelineByPropertyName = $true,
                Position = 1)]
     [Alias('PSPath')]
     [String[]]$LiteralPath = $null,
@@ -18,7 +18,6 @@
     [switch]$Recurse,
     [string]$CssFile = $CssPath
   )
-  
   #region Initialize
   $builder = New-Object Markdig.MarkdownPipelineBuilder
   # use UseAdvancedExtensions for better error reporting
