@@ -107,16 +107,19 @@ Module Name: md2html
 			# IconUri = ''
 
 			# ReleaseNotes of this module
-			# ReleaseNotes = ''
+			 ReleaseNotes = 'Hellow'
 
 		} # End of PSData hashtable
-
+		#Configuration for module cmdlets
+		#Rooted from the folder of this manifest
+		Config = @{
+			None 			     = "data/none.css"
+			CssPath              = "data/markdownpad-github.min.css"
+			HighlightJsCssPath   = "data/vs.min.css"
+			#Highlight local
+            HighlightJsPathLocal = 'file://corp/it/MKT/DEPT/IT%20Spatial/OMS%20GIS/libs/highlight.js/highlight.pack.js'
+			#Highlight on the Web
+			HighlightJsPath      ='https://highlightjs.org/static/highlight.pack.js'
+		}
 	} # End of PrivateData hashtable
 }
-
-
-
-
-
-
-

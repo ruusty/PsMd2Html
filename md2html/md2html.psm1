@@ -23,8 +23,9 @@ Foreach ($import in @($Public + $Private))
 # Export Public functions ($Public.BaseName) for WIP modules
 # Set variables visible to the module and its functions only
 
-$CssPath = Join-Path $PSScriptRoot "markdownpad-github.css"
+
 Add-Type -Path $(Join-Path $PSScriptRoot "Markdig.dll")
 Export-ModuleMember -Function $Public.Basename
 New-Alias -Name md2html -Value convert-Markdown2Html -Description "Converts Markdown documents to html"
+New-Alias -name ConvertTo-mdHtml -value convert-Markdown2Html -Description "Backward compatibility" -verbose -Force -option AllScope
 
