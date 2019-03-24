@@ -25,7 +25,8 @@ Foreach ($import in @($Public + $Private))
 
 
 Add-Type -Path $(Join-Path $PSScriptRoot "Markdig.dll")
-Export-ModuleMember -Function $Public.Basename
-New-Alias -Name md2html -Value convert-Markdown2Html -Description "Converts Markdown documents to html"
-New-Alias -name ConvertTo-mdHtml -value convert-Markdown2Html -Description "Backward compatibility" -verbose -Force -option AllScope
 
+Set-Alias -name ConvertTo-mdHtml -value convert-Markdown2Html -Description "Backward compatibility V2"
+Set-Alias -name md2Html -value convert-Markdown2Html -Description "Backward compatibility V2"
+#set-alias ConvertTo-mdHtml  convert-Markdown2Html
+Export-ModuleMember -Function $Public.Basename -alias  ConvertTo-mdHtml,md2Html -verbose

@@ -19,3 +19,5 @@ Specification/*.xml
 *.TempPoint.ps1
 *.TempPoint.psm1
 Work
+/md2html/Specification/*.xml
+/md2html/Untitled-1.ps1

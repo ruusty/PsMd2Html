@@ -9,10 +9,7 @@
 function Get-ConfigData {
     [CmdletBinding()]
     Param()
-    Begin {}
-    Process {
-        $MyInvocation.MyCommand.Module.PrivateData.config
-        #$MyInvocation.MyCommand.Module.PrivateData.config | format-table | out-string | write-verbose
-    }
-    End {}
+        $config = $MyInvocation.MyCommand.Module.PrivateData.config
+        $config | format-table | out-string | write-verbose -verbose:$false
+        $config
 }

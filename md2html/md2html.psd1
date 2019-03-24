@@ -11,7 +11,7 @@ Module Name: md2html
 @{
 
 	# Script module or binary module file associated with this manifest
-	ModuleToProcess = 'md2html.psm1'
+	RootModule = 'md2html.psm1'
 
 	# Version number of this module.
 	ModuleVersion = '2.0.0.0'
