@@ -220,17 +220,13 @@ task Show-Settings -description "Display the psake configuration properties vari
 }
 
 task unit-test {
-  $FilePath = "$PSScriptRoot/Specification/Pester.Tests.md2html.bat"
-  & $FilePath
-  #write-Host "`$LastExitCode=$LastExitCode`r`n"
-  $rc = $LastExitCode
-  if ($rc -ne 0)
-  {
-    & "$Env:SystemRoot\system32\cmd.exe" /c exit $rc
-    $e = [System.Management.Automation.RuntimeException]$("{0} ExitCode:{1}" -f $FilePath, $rc)
-    Write-Error -exception $e -Message $("{0} process.ExitCode {1}" -f $FilePath, $rc) -TargetObject $FilePath -category "InvalidResult"
-  }
   
+    $testResults = Invoke-Pester -Script @{Path = "md2html\Specification\*.Tests.ps1"; Parameters = @{Verbose = $true; }}  -PassThru 
+    if ($testResults.FailedCount -gt 0) {
+        $testResults | Format-List
+        Write-Error -Message 'One or more Pester tests failed. Build cannot continue!'
+        #Write-Error -exception $e -Message $("{0} process.ExitCode {1}" -f $FilePath, $rc) -TargetObject $FilePath -category "InvalidResult"
+    }
 }
 
 
