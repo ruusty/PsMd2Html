@@ -74,12 +74,14 @@ function Convert-Markdown2Html
       Format-Table -AutoSize @{ Label = "Name"; Expression = { $_.Name }; }, @{ Label = "Value"; Expression = { (Get-Variable -Name $_.Name -EA SilentlyContinue).Value }; }) |
     Out-String | write-verbose
     #endregion
-    write-verbose $('{0}-{1}' -f '$WhatIfPreference', $WhatIfPreference)
-    [string]$CssPath = $(join-path -path $MyInvocation.MyCommand.Module.ModuleBase -ChildPath $(Get-ConfigData).CssPath)
-        [string]$HighlightCssPath = $(join-path -path $MyInvocation.MyCommand.Module.ModuleBase -ChildPath $(Get-ConfigData).HighlightJsCssPath)
-    [string]$HighlightJsPath = (Get-ConfigData).HighlightJsPath
-    [string]$HighlightJsPathLocal = (Get-ConfigData).HighlightJsPathLocal
-    @('CssPath', 'HighlightCssPath', 'HighlightJsPathLocal', 'HighlightJsPath') | Get-Variable -ea Continue | Sort-Object -Property name -CaseSensitive | Format-Table -property name, value -autosize | Out-String -Width 80 | write-verbose
+
+    $config = Get-ConfigData
+    #$config | format-table | out-string -width 80 | write-Verbose
+    [string]$CssPath = $(join-path -path $MyInvocation.MyCommand.Module.ModuleBase -ChildPath  $config.CssPath)
+    [string]$HighlightCssPath = $(join-path -path $MyInvocation.MyCommand.Module.ModuleBase -ChildPath  $config.HighlightJsCssPath)
+    [string]$HighlightJsPath =  $config.HighlightJsPath
+    [string]$HighlightJsPathLocal =  $config.HighlightJsPathLocal
+     "Configuration" +(@('CssPath', 'HighlightCssPath', 'HighlightJsPathLocal', 'HighlightJsPath') | Get-Variable -ea Continue | Sort-Object -Property name -CaseSensitive | Format-Table -property name, value -autosize | Out-String -Width 80) | write-verbose
   }
   Process
   {

@@ -84,7 +84,7 @@ Describe "Manifest" {
   It "Should export public script functions" {
     $numFunctions = 1
     $ExportedCommands = $(get-module $ModuleName).ExportedCommands
-    $Functions = $ExportedCommands.GetEnumerator() | ForEach-Object { $_.value } | Where-Object { ($_.CommandType -eq 'Function') }
+    $Functions = $ExportedCommands.GetEnumerator() | % { $_.value } | Where-Object { ($_.CommandType -eq 'Function') }
     $FunctionCount = ($Functions).count
     $FunctionCount | Should be $numFunctions
     
