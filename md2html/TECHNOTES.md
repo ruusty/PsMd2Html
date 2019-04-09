@@ -1,4 +1,4 @@
-# __ApplicationName__ <!-- omit in toc --> #
+# md2html <!-- omit in toc --> #
 
 ~~~text
 Project:        GIS/OMS
@@ -16,12 +16,9 @@ Table of Contents
 
 ## Description ##
 
-<https://id.lipsum.com/>
-
 ~~~powershell
- md2html\Convert-Markdown2Html -path $ProjBuildPath -recurse -verbose
+md2html\Convert-Markdown2Html -path $ProjBuildPath -recurse -verbose
 ~~~
-
 
 Need to support this in build scripts
 ~~~powershell

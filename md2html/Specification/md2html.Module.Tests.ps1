@@ -67,7 +67,7 @@ Describe 'Convert-Markdown2Html' {
   Pester changes Get-ConfigData and returns null, so need to mock with this taken from the Module Manifest md2html.psd1 
   PrivateData hashtable
   #>
-    mock -CommandName 'Get-ConfigData' -ModuleName 'md2html' -MockWith {
+    Mock -CommandName 'Get-ConfigData' -ModuleName 'md2html' -MockWith {
         @{
             None                 = "data/none.css"
             CssPath              = "data/markdownpad-github.min.css"
@@ -80,7 +80,7 @@ Describe 'Convert-Markdown2Html' {
     }
     It "Converts markdown multiple file(s) from <Path> to <ReferencePath> (test1)" `
         -TestCases @(
-        @{Path = 'test1/*.md'; ReferencePath = 'test1/*.html'}
+        @{Path = 'test1/*.md'; ReferencePath = 'test1/*.html' }
     ) `
     {
         param($Path, $ReferencePath)
@@ -88,7 +88,7 @@ Describe 'Convert-Markdown2Html' {
         $testPath = Join-Path $SCRIPT:UncPath -ChildPath $Path
         #$refPath  = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
 
-        md2html\Convert-Markdown2Html -Path $testPath -verbose:$IsVerbose
+        Convert-Markdown2Html -Path $testPath -verbose:$IsVerbose
        
         Get-ChildItem -path $testPath | ForEach-Object {
             $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
@@ -101,22 +101,22 @@ Describe 'Convert-Markdown2Html' {
      
     It "Should Not convert non-md files (test0)" `
         -TestCases @(
-        @{Path = 'test0/*.md;test0/*.txt'; ReferencePath = 'test0/*.html'}
+        @{Path = 'test0/*.md;test0/*.txt'; ReferencePath = 'test0/*.html' }
     ) `
     {
         param($Path, $ReferencePath)
-        $testPath = $Path -split ';' | % {Join-Path -Path $SCRIPT:UncPath -ChildPath $_}
+        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         #$refPath  = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
-        $testPath | write-verbose -verbose:$IsVerbose
-        md2html\Convert-Markdown2Html -Path $testPath -verbose:$IsVerbose
+        $testPath | Write-Verbose -verbose:$IsVerbose
+        Convert-Markdown2Html -Path $testPath -verbose:$IsVerbose
 
         Get-ChildItem -path $testPath | ForEach-Object {
             $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
             $x = [System.IO.Path]::GetExtension($_.FullName)
             switch ($x) {
-                '.md' {  $result | Should  Exist}
-                '.txt' {  $result | Should not Exist}
-                Default {}
+                '.md' { $result | Should  Exist }
+                '.txt' { $result | Should not Exist }
+                Default { }
             }
           
         }
@@ -125,26 +125,30 @@ Describe 'Convert-Markdown2Html' {
 
     It "Create and modify date time should be same as md (test2)" `
         -TestCases @(
-        @{Path = 'test2/*.md;test2/*.txt'; ReferencePath = 'test2/*.html'}
+        @{Path = 'test2/*.md;test2/*.txt'; ReferencePath = 'test2/*.html' }
     ) `
     {
         param($Path, $ReferencePath)
-        $testPath = $Path -split ';' | % {Join-Path -Path $SCRIPT:UncPath -ChildPath $_}
+        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         #$refPath  = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
-        $testPath | write-verbose -verbose:$IsVerbose
-        md2html\Convert-Markdown2Html -Path $testPath -verbose:$IsVerbose
+        $testPath | Write-Verbose -verbose:$IsVerbose
+        Convert-Markdown2Html -Path $testPath -verbose:$IsVerbose
 
         Get-ChildItem -path $testPath | ForEach-Object {
             $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
             $x = [System.IO.Path]::GetExtension($_.FullName)
+            $LastWriteTime = $_.LastWriteTime 
+            $CreationTime = $_.CreationTime
             switch ($x) {
                 '.md' {  
+                    Write-Host $result
+                    Write-host $_
                     $result | Should  Exist
-                    ( $_.lastwritetime -eq (Get-ChildItem -Path $result).lastwritetime -and
-                        $_.CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
+                    ( $LastWriteTime -eq (Get-ChildItem -Path $result).LastWriteTime -and
+                        $CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
                 }
-                '.txt' {  $result | Should not Exist}
-                Default {}
+                '.txt' { $result | Should not Exist }
+                Default { }
             }
          
         }
@@ -155,27 +159,29 @@ Describe 'Convert-Markdown2Html' {
 
     It "Should recurse folders (test3)" `
         -TestCases @(
-        @{Path = 'test3/*.md'; ReferencePath = 'test3/*.html'}
+        @{Path = 'test3/*.md'; ReferencePath = 'test3/*.html' }
     ) `
     {
         param($Path, $ReferencePath)
-        $testPath = $Path -split ';' | ForEach-Object {Join-Path -Path $SCRIPT:UncPath -ChildPath $_}
+        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
-        $testPath | write-verbose -verbose:$IsVerbose
-        md2html\Convert-Markdown2Html -Path $testPath -recurse -verbose:$IsVerbose
+        $testPath | Write-Verbose -verbose:$IsVerbose
+        Convert-Markdown2Html -Path $testPath -recurse -verbose:$IsVerbose
 
         $mdFiles = Get-ChildItem -path $testPath -Recurse 
 
-        $mdFiles| ForEach-Object {
+        $mdFiles | ForEach-Object {
             $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
             $x = [System.IO.Path]::GetExtension($_.FullName)
+            $LastWriteTime = $_.LastWriteTime 
+            $CreationTime = $_.CreationTime
             switch ($x) {
                 '.md' {  
                     $result | Should  Exist
-                    ( $_.lastwritetime -eq (Get-ChildItem -Path $result).lastwritetime -and $_.CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
+                    ( $LastWriteTime -eq (Get-ChildItem -Path $result).LastWriteTime -and $CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
                 }
-                '.txt' {  $result | Should not Exist}
-                Default {}
+                '.txt' { $result | Should not Exist }
+                Default { }
             }
          
         }
@@ -189,27 +195,29 @@ Describe 'Convert-Markdown2Html' {
    
     It "Should support ConvertTo-mdHtml (test4)" `
         -TestCases @(
-        @{Path = 'test4/*.md'; ReferencePath = 'test4/*.html'}
+        @{Path = 'test4/*.md'; ReferencePath = 'test4/*.html' }
     ) `
     {
         param($Path, $ReferencePath)
-        $testPath = $Path -split ';' | ForEach-Object {Join-Path -Path $SCRIPT:UncPath -ChildPath $_}
+        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
-        $testPath | write-verbose -verbose:$IsVerbose
-        ConvertTo-mdHtml -Path $testPath -recurse -verbose:$IsVerbose
+        $testPath | Write-Verbose -verbose:$IsVerbose
+        convertTo-mdHtml -Path $testPath -recurse -verbose:$IsVerbose
 
         $mdFiles = Get-ChildItem -path $testPath -Recurse 
 
-        $mdFiles| ForEach-Object {
+        $mdFiles | ForEach-Object {
             $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
             $x = [System.IO.Path]::GetExtension($_.FullName)
+            $LastWriteTime = $_.LastWriteTime 
+            $CreationTime = $_.CreationTime
             switch ($x) {
                 '.md' {  
                     $result | Should  Exist
-                    ( $_.lastwritetime -eq (Get-ChildItem -Path $result).lastwritetime -and $_.CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
+                    ( $LastWriteTime -eq (Get-ChildItem -Path $result).LastWriteTime -and $CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
                 }
-                '.txt' {  $result | Should not Exist}
-                Default {}
+                '.txt' { $result | Should not Exist }
+                Default { }
             }
          
         }
@@ -221,27 +229,29 @@ Describe 'Convert-Markdown2Html' {
     # It should highlight
     It "Should Support code highlight (test5)" `
         -TestCases @(
-        @{Path = 'test5/*.md'; ReferencePath = 'test5/*.html'}
+        @{Path = 'test5/*.md'; ReferencePath = 'test5/*.html' }
     ) `
     {
         param($Path, $ReferencePath)
-        $testPath = $Path -split ';' | ForEach-Object {Join-Path -Path $SCRIPT:UncPath -ChildPath $_}
+        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
-        $testPath | write-verbose -verbose:$IsVerbose
-        ConvertTo-mdHtml -Path $testPath -Hilite -recurse -verbose:$IsVerbose
+        $testPath | Write-Verbose -verbose:$IsVerbose
+        convertTo-mdHtml -Path $testPath -Hilite -recurse -verbose:$IsVerbose
 
         $mdFiles = Get-ChildItem -path $testPath -Recurse 
 
-        $mdFiles| ForEach-Object {
+        $mdFiles | ForEach-Object {
             $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
             $x = [System.IO.Path]::GetExtension($_.FullName)
+            $LastWriteTime = $_.LastWriteTime 
+            $CreationTime = $_.CreationTime
             switch ($x) {
                 '.md' {  
                     $result | Should  Exist
-                    ( $_.lastwritetime -eq (Get-ChildItem -Path $result).lastwritetime -and $_.CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
+                    ( $LastWriteTime -eq (Get-ChildItem -Path $result).LastWriteTime -and $CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
                 }
-                '.txt' {  $result | Should not Exist}
-                Default {}
+                '.txt' { $result | Should not Exist }
+                Default { }
             }
          
         }
@@ -252,33 +262,74 @@ Describe 'Convert-Markdown2Html' {
    
     It "Should convert empty md (test6)" `
         -TestCases @(
-        @{Path = "test6\*.md"; ReferencePath = "test6\*.html"}
+        @{Path = "test6\*.md"; ReferencePath = "test6\*.html" }
     ) `
     {
         param($Path, $ReferencePath)
-        $testPath = $Path -split ';' | ForEach-Object {Join-Path -Path $SCRIPT:UncPath -ChildPath $_}
+        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
-        $testPath | write-verbose -verbose:$IsVerbose
-        $testPath | ConvertTo-mdHtml -Hilite -recurse -verbose:$IsVerbose
+        $testPath | Write-Verbose -verbose:$IsVerbose
+        $testPath | convertTo-mdHtml -Hilite -recurse -verbose:$IsVerbose
 
         $mdFiles = Get-ChildItem -path $testPath -Recurse 
 
-        $mdFiles| ForEach-Object {
+        $mdFiles | ForEach-Object {
             $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
+            $mdPath = $_.FullName
             $x = [System.IO.Path]::GetExtension($_.FullName)
+            $LastWriteTime = $_.LastWriteTime 
+            $CreationTime = $_.CreationTime
             switch ($x) {
                 '.md' {  
                     $result | Should  Exist
-                    ( $_.lastwritetime -eq (Get-ChildItem -Path $result).lastwritetime -and $_.CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
+                    ( $LastWriteTime -eq ((Get-ChildItem -Path $result).LastWriteTime) -and $CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
                 }
-                '.txt' {  $result | Should not Exist}
-                Default {}
+                '.txt' { $result | Should not Exist }
+                Default { }
             }
-         
         }
-        $htmlFiles = Get-ChildItem -path $refPath -Recurse 
-        $htmlFiles.Count | Should -BeExactly $mdFiles.Count
+        $refPath | Should -FileContentMatch '<script src="https://highlightjs.org/static/highlight.pack.js"></script>'
+        $mdFile= Get-ChildItem -path $mdPath -Recurse -Verbose:$IsVerbose | Measure-Object 
+        $htmlFiles = Get-ChildItem -path $refPath -Recurse -Verbose:$IsVerbose | Measure-Object
+        $htmlFiles.count | Should -BeExactly $mdFile.Count
+    }
+
+
+    It "Should convert md with alias md2html (test7)" `
+        -TestCases @(
+        @{Path = "test7\*.md"; ReferencePath = "test7\*.html" }
+    ) `
+    {
+        param($Path, $ReferencePath)
+        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
+        $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
+        $testPath | Write-Verbose -verbose:$IsVerbose
+        $testPath | md2html -Hilite -recurse -verbose:$IsVerbose
+
+        $mdFiles = Get-ChildItem -path $testPath -Recurse 
+
+        $mdFiles | ForEach-Object {
+            $mdPath = $_.FullName
+            $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
+            $x = [System.IO.Path]::GetExtension($_.FullName)
+            $LastWriteTime = $_.LastWriteTime 
+            $CreationTime = $_.CreationTime
+            switch ($x) {
+                '.md' {  
+                    $result | Should  Exist
+                    ( $LastWriteTime -eq (Get-ChildItem -Path $result).LastWriteTime -and $CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
+                }
+                '.txt' { $result | Should not Exist }
+                Default { }
+            }
+        }
+        $refPath | Should -FileContentMatch '<script src="https://highlightjs.org/static/highlight.pack.js"></script>'
+        $refPath | Should -FileContentMatch '<style type="text/css">.hljs'
+        $mdFile = Get-ChildItem -path $mdPath -Recurse -Verbose:$IsVerbose | Measure-Object 
+        $htmlFiles = Get-ChildItem -path $refPath -Recurse -Verbose:$IsVerbose | Measure-Object
+        $htmlFiles.count | Should -BeExactly $mdFile.Count
     }
  
+    
 }
 

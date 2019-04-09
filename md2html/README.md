@@ -30,18 +30,21 @@ convert-Markdown2Html -path *.md
 ~~~
 
 ~~~powershell
-   "*.md", 'README*.md', "..\Specification\*.md", "..\Specification\*.md" | Convert-Markdown2Html -verbose -recurse -Hilite
+"*.md", 'README*.md', "..\Specification\*.md", "..\Specification\*.md" | Convert-Markdown2Html -verbose -recurse -Hilite
 ~~~
 
 ~~~powershell
-   "*.md", 'README*.md', "..\Specification\*.md", "..\Specification\*.md" | Convert-Markdown2Html -verbose -recurse -HighlightLocal
+"*.md", 'README*.md', "..\Specification\*.md", "..\Specification\*.md" | Convert-Markdown2Html -verbose -recurse -HighlightLocal
 ~~~
 
 ### Example Usage ###
 
 ~~~powershell
-New-Alias -Name md2html -Value convert-Markdown2Html -Description "Converts Markdown documents to html"
 md2html -verbose -recurse
+~~~
+
+~~~powershell
+Convert-md2html -verbose -recurse
 ~~~
 
 ```dos
@@ -82,9 +85,9 @@ md2html
 
 `md2html.bat` is installed by _Chocolatey_
 
-~~~dos
+~~~powershell
 @echo off
-powershell -NoProfile -ExecutionPolicy unrestricted import-module -verbose 'D:\Users\Russell\.PowershellModules\OraclePlSqlInstaller'; convertto-mdhtml %* -verbose
+powershell -NoProfile -ExecutionPolicy unrestricted import-module -verbose md2html\Convert-Markdown2Html  
 ~~~
 
 ## Markdown Examples ##

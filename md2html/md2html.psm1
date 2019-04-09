@@ -28,5 +28,5 @@ Add-Type -Path $(Join-Path $PSScriptRoot "Markdig.dll")
 
 Set-Alias -name ConvertTo-mdHtml -value convert-Markdown2Html -Description "Backward compatibility V2"
 Set-Alias -name md2Html -value convert-Markdown2Html -Description "Backward compatibility V2"
-#set-alias ConvertTo-mdHtml  convert-Markdown2Html
-Export-ModuleMember -Function $Public.Basename -alias  ConvertTo-mdHtml,md2Html -verbose
+set-alias -name Convert-md2Html -value convert-Markdown2Html
+Export-ModuleMember -Function $Public.Basename -alias  ConvertTo-mdHtml, md2Html, Convert-md2Html 

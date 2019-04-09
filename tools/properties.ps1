@@ -2,19 +2,26 @@
 #e.g. LOCALAPPDATA=C:\Users\Russell\AppData\Local
 # Should be a local disk
 $poshModFolder = ".PowershellModules"
-$installRootDirPath = $((Split-Path -Path $env:LOCALAPPDATA) | Split-Path) | Join-Path -child $poshModFolder
 
-# May fail because infecto disables network drive letters when in Elevated Privledge
-# Causes join-path to fail. Join-path does not fail when Drive is non-existant
-try
-{
-  $installRootDirPath = $(join-path -path $(join-path -path $env:HOMEDRIVE -child $env:HOMEPATH) -child $poshModFolder)
+if ($Hostname -like "COVM*") {
+    #Ched Servers
+    $installRootDirPath = "$env:ProgramFiles\Ched Services\posh\Modules"
 }
-catch
-{
-  Write-Host $_
+else {
+    $installRootDirPath = $((Split-Path -Path $env:LOCALAPPDATA) | Split-Path) | Join-Path -child $poshModFolder
 }
-$moduleName="md2html" #Top filepath in zip file
 
-$ZipName ="PSmd2html.zip"
+$moduleName = "md2html" #Top filepath in zip file
+$moduleDirPath = Join-Path -Path $installRootDirPath -ChildPath $moduleName
+
+$ZipName = "PS$moduleName.zip"
+
+$config_vars += @(
+    'installRootDirPath'
+    , 'moduleName'
+    , 'moduleDirPath'
+    , 'ZipName'
+)
+
+$config_vars | Get-Variable | Sort-Object -unique -property "Name" | Select-Object Name, value | Format-Table | Out-Host
 
