@@ -3,8 +3,6 @@
 *.zip
 *.log
 *.url
-prj/**/*
-.Archive/**/*
 *.Build.Number
 /build
 /dist
@@ -14,7 +12,9 @@ prj/**/*
 /*.vpwhist
 /*.vtg
 *.history.txt
-PSmd2html.build
 Specification/*.xml
 *.TempPoint.ps1
 *.TempPoint.psm1
+Work
+/md2html/Specification/*.xml
+/md2html/Untitled-1.ps1
