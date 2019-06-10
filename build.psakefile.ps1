@@ -35,7 +35,7 @@ function Get-SettingFromXML {
             Position = 1)]
         [string]$xpath
     )
-    Write-Debug $('Getting value from xpath : {0}' -f $xpath)
+    Write-Verbose $('Getting value from xpath : {0}' -f $xpath)
     try {
         $Xmldoc.SelectNodes($xpath).value
     }
@@ -87,14 +87,14 @@ Properties {
     $GlobalPropertiesXML = New-Object XML
     $GlobalPropertiesXML.Load($GlobalPropertiesPath)
   
-    $GitExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='git.exe']"
-    $7zipExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.7zip']"
-    $ChocoExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.choco']"  
-    $CoreDeliveryDirectory = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.dir']" 
-    $CoreReleaseStartDate = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='GisOms.release.StartDate']"  
-    $CoreChocoFeed =        Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.chocoFeed.dir']"
-    $SpatialGitHubPath =    Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='Spatial_GitHub.Path']"
-    $CoreMajorMinor = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='GisOms.release.MajorMinor']"
+    $GitExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='git.exe']" -verbose:$IsVerbose
+    $7zipExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.7zip']"-verbose:$IsVerbose
+    $ChocoExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.choco']"  -verbose:$IsVerbose
+    $CoreDeliveryDirectory = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.dir']" -verbose:$IsVerbose
+    $CoreReleaseStartDate = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='GisOms.release.StartDate']"  -verbose:$IsVerbose
+    $CoreChocoFeed =        Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.chocoFeed.dir']" -verbose:$IsVerbose
+    #$SpatialGitHubPath =    Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='Spatial_GitHub.Path']" -verbose:$IsVerbose
+    $CoreMajorMinor = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='GisOms.release.MajorMinor']" -verbose:$IsVerbose
 
     $ProjectName = [System.IO.Path]::GetFileName($PSScriptRoot)
     $ProjTopdir = $PSScriptRoot

@@ -41,9 +41,34 @@ function Convert-Markdown
   Begin
   {
     #region Initialize
-    $builder = New-Object Markdig.MarkdownPipelineBuilder
-    # use UseAdvancedExtensions for better error reporting
-    $pipeline = [Markdig.MarkdownExtensions]::UseAdvancedExtensions($builder).Build()
+        [string[]]$advancedMarkdownExtensions = @(
+            'abbreviations' ## .UseAbbreviations()
+            ##'autoidentifiers' ## .UseAutoIdentifiers()
+            'citations' ## .UseCitations()
+            'customcontainers' ## .UseCustomContainers()
+            'definitionlists' ## .UseDefinitionLists()
+            'emphasisextras' ## .UseEmphasisExtras()
+            'figures' ## .UseFigures()
+            'footers' ## .UseFooters()
+            'footnotes' ## .UseFootnotes()
+            'gridtables' ## .UseGridTables()
+            'mathematics' ## .UseMathematics()
+            'medialinks' ## .UseMediaLinks()
+            'pipetables' ## .UsePipeTables()
+            'listextras' ## .UseListExtras()
+            'tasklists' ## .UseTaskLists()
+            'diagrams' ## .UseDiagrams()
+            'autolinks' ## .UseAutoLinks()
+            'attributes' ## .UseGenericAttributes();
+        )
+        ## configure the Markdig pipeline
+        [Markdig.MarkdownPipelineBuilder]$pipelineBuilder = (New-Object Markdig.MarkdownPipelineBuilder)
+        Write-Verbose "Adding Markdig parser extensions .UseAutoIdentifiers(GitHub)"
+        $pipelineBuilder = [Markdig.MarkDownExtensions]::UseAutoIdentifiers($pipelineBuilder, [Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions]::GitHub)
+        Write-Verbose "Adding Markdig parser extensions $advancedMarkdownExtensions"
+        $pipelineBuilder = [Markdig.MarkDownExtensions]::Configure($pipelineBuilder, [string]::Join('+', $advancedMarkdownExtensions))
+        Write-verbose "Building Markdig pipeline"
+        $pipeline = $pipelineBuilder.Build()
     #endregion Initialize
     
     #region setup
@@ -51,7 +76,7 @@ function Convert-Markdown
     $CommandName = $PSCmdlet.MyInvocation.InvocationName;
     # Get the list of parameters for the command
     "${CommandName}: Input", (((Get-Command -Name ($PSCmdlet.MyInvocation.InvocationName)).Parameters) |
-      % { Get-Variable -Name $_.Values.Name -ErrorAction SilentlyContinue; } |
+      ForEach-Object { Get-Variable -Name $_.Values.Name -ErrorAction SilentlyContinue; } |
       Format-Table -AutoSize @{ Label = "Name"; Expression = { $_.Name }; }, @{ Label = "Value"; Expression = { (Get-Variable -Name $_.Name -EA SilentlyContinue).Value }; }) |
     Out-String | write-verbose
     #endregion

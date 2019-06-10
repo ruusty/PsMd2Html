@@ -5,6 +5,8 @@ Version:        4.3.6415.8603
 Date:           2017-05-15T23-53
 ~~~
 
+<a name="TOC"></a>
+
 - [Description](#description)
 - [Powershell Usage](#powershell-usage)
   - [Example Usage](#example-usage)
@@ -12,16 +14,21 @@ Date:           2017-05-15T23-53
     - [Get help](#get-help)
 - [Cmd Usage](#cmd-usage)
 - [Markdown Examples](#markdown-examples)
+- [Markdig](#markdig)
 - [CommonMark](#commonmark)
 - [Resources](#resources)
 - [highlightjs](#highlightjs)
 - [Changes](#changes)
+
+[&uarr;](#TOC)
 
 ## Description ##
 
 md2html is a PowerShell module to automate converting Markdown files into html files.
 
 Uses the __[Markdig](https://github.com/lunet-io/markdig)__ CommonMark compliant, extensible Markdown processor for .NET.
+
+[&uarr;](#TOC)
 
 ## Powershell Usage ##
 
@@ -77,6 +84,8 @@ $(get-module md2html).ExportedCommands.Keys
 $(get-module md2html).ExportedCommands.Keys |% {get-help $_}
 ```
 
+[&uarr;](#TOC)
+
 ## Cmd Usage ##
 
 ~~~dos
@@ -89,6 +98,8 @@ md2html
 @echo off
 powershell -NoProfile -ExecutionPolicy unrestricted import-module -verbose md2html\Convert-Markdown2Html  
 ~~~
+
+[&uarr;](#TOC)
 
 ## Markdown Examples ##
 
@@ -131,16 +142,26 @@ Three consecutive dots ... into an ellipsis entity
 This is a spoiler
 :::
 
+[&uarr;](#TOC)
+
+## Markdig ##
+
+The  [Markdig.Signed](https://www.nuget.org/packages/Markdig.Signed/) NuGet package provides the _net40_ signed assemblies.
+
+[&uarr;](#TOC)
+
 ## CommonMark ##
 
-__[commonmark.org](http://commonmark.org)__ 
-
+- __[commonmark.org](http://commonmark.org)__
 - Specification for __[CommonMark](http://spec.commonmark.org)__.
 - CommonMark __[code](http://code.commonmark.org)__ on GitHub.
 - The official __[dingus](http://try.commonmark.org)__ which allows people to experiment.
 
+[&uarr;](#TOC)
+
 ## Resources ##
 
+- [Markdig.Signed](https://www.nuget.org/packages/Markdig.Signed/) NuGet package provides signed assemblies.
 - [mastering-markdown](https://guides.github.com/features/mastering-markdown)
 - <https://www.nuget.org/packages/Markdig.Signed>
 - <https://github.com/lunet-io/markdig>
@@ -149,11 +170,21 @@ __[commonmark.org](http://commonmark.org)__
 - <https://www.markdownguide.org/extended-syntax/>
 - <http://www.tablesgenerator.com/markdown_tables>
 
+[&uarr;](#TOC)
+
 ## highlightjs ##
 
 - <https://highlightjs.org/download/>
 - <https://highlightjs.readthedocs.io/en/latest/>
 
+[&uarr;](#TOC)
+
 ## Changes ##
 
-2019-02-14 Markdig.dll 0.15.7.0
+- 2019-06-10
+  - Markdig.dll markdig.signed.0.17.0
+  - Markdig pipeline configured with UseAutoIdentifiers(Github)
+- 2019-02-14
+  - Markdig.dll markdig.signed.0.15.7.0
+
+[&uarr;](#TOC)

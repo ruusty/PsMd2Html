@@ -2,15 +2,14 @@
 
 ~~~text
 Project:        GIS/OMS
-Product:        __ApplicationName__
+Product:        md2html
 Version:        4.3.00.00
-Date:           __localdate__
-Description:    __ApplicationDesc__
+Date:           2019-06-10
+Description:    md2html Tech notes
 ~~~
 
 <a name="TOC"></a>
 
-Table of Contents
 
 - [Description](#description)
 
@@ -20,7 +19,8 @@ Table of Contents
 md2html\Convert-Markdown2Html -path $ProjBuildPath -recurse -verbose
 ~~~
 
-Need to support this in build scripts
+- Need to support this in build scripts
+
 ~~~powershell
 import-module -verbose:$verbose md2html; convertto-mdhtml -verbose:$verbose  -recurse
 ~~~
