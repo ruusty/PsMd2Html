@@ -21,6 +21,7 @@ filter Skip-Empty { $_ | Where-Object { $_ -ne $null -and $_ } }
 $IsVerbose = $false
 $PSBoundParameters | Out-String | Write-Verbose -verbose:$IsVerbose
 
+import-module -RequiredVersion 4.6.0 pester
 Import-Module "$PSScriptRoot\md2html"
 Import-Module Ruusty.ReleaseUtilities -verbose:$IsVerbose
 
@@ -59,6 +60,7 @@ Properties {
         , "CoreDeliveryDirectory"
         , "CoreReleaseStartDate"
         , "ProjectName"
+        , "ProjectId"
         , "ProjTopdir"
         , "ProjBuildPath"
         , "ProjDistPath"
@@ -81,38 +83,44 @@ Properties {
     $Branch = & { git.exe symbolic-ref --short HEAD }
     $isMaster = if ($Branch -eq 'master') { $true } else { $false }
     Write-Verbose($("CurrentLocation={0}" -f $executionContext.SessionState.Path.CurrentLocation))
-    $GlobalPropertiesName = $("GisOms.Chocolatey.properties.{0}.xml" -f $env:COMPUTERNAME)
+    $GlobalPropertiesName = $("Ruusty.Chocolatey.properties.{0}.xml" -f $env:COMPUTERNAME)
     $GlobalPropertiesPath = Ruusty.ReleaseUtilities\Find-FileUp $GlobalPropertiesName
   
     $GlobalPropertiesXML = New-Object XML
     $GlobalPropertiesXML.Load($GlobalPropertiesPath)
   
-    $GitExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='git.exe']" -verbose:$IsVerbose
-    $7zipExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.7zip']"-verbose:$IsVerbose
-    $ChocoExe = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.choco']"  -verbose:$IsVerbose
-    $CoreDeliveryDirectory = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.dir']" -verbose:$IsVerbose
-    $CoreReleaseStartDate = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='GisOms.release.StartDate']"  -verbose:$IsVerbose
-    $CoreChocoFeed =        Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.chocoFeed.dir']" -verbose:$IsVerbose
-    #$SpatialGitHubPath =    Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='Spatial_GitHub.Path']" -verbose:$IsVerbose
-    $CoreMajorMinor = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='GisOms.release.MajorMinor']" -verbose:$IsVerbose
+    $GitExe                 = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='git.exe']" -verbose:$IsVerbose
+    $7zipExe                = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.7zip']"-verbose:$IsVerbose
+    $ChocoExe               = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='tools.choco']"  -verbose:$IsVerbose
+    $CoreDeliveryDirectory  = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.dir']" -verbose:$IsVerbose
+    $CoreReleaseStartDate   = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='Ruusty.release.StartDate']"  -verbose:$IsVerbose
+    $CoreChocoFeed          = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='core.delivery.chocoFeed.dir']" -verbose:$IsVerbose
+    $CoreMajorMinor         = Get-SettingFromXML -xmldoc $GlobalPropertiesXML -xpath "/project/property[@name='Ruusty.release.MajorMinor']" -verbose:$IsVerbose
 
-    $ProjectName = [System.IO.Path]::GetFileName($PSScriptRoot)
+    $NuspecPath = $(Get-ChildItem -path "$PSScriptRoot/*.nuspec")[0].fullname
+    $NuspecPropertiesXML = New-Object XML
+    $NuspecPropertiesXML.Load($NuspecPath)
+
+    #$ProjectName = [System.IO.Path]::GetFileName($PSScriptRoot)
+    $ProjectName = $NuspecPropertiesXML.package.metadata.title
+    $ProjectId= $NuspecPropertiesXML.package.metadata.id
+
     $ProjTopdir = $PSScriptRoot
-    $ProjBuildPath = Join-Path $ProjTopdir "Build"
-    $ProjDistPath = Join-Path $ProjTopdir "Dist"
-    $ProjPackageListPath = Join-Path $ProjTopdir "${ProjectName}.lis"
-    $ProjPackageZipPath = Join-Path $ProjDistPath  "${ProjectName}.zip"
-    $ProjDeliveryPath = Join-Path $(Join-Path $CoreDeliveryDirectory ${ProjectName})  '${versionNum}'
-    $ProjPackageZipVersionPath = Join-Path $ProjDeliveryPath  '${ProjectName}.${versionNum}.zip'
+    $ProjBuildPath              = Join-Path $ProjTopdir "Build"
+    $ProjDistPath               = Join-Path $ProjTopdir "Dist"
+    $ProjPackageListPath        = Join-Path $ProjTopdir    "${ProjectName}.lis"
+    $ProjPackageZipPath         = Join-Path $ProjDistPath  "${ProjectName}.zip"
+    $ProjDeliveryPath           = Join-Path $(Join-Path $CoreDeliveryDirectory ${ProjectName})  '${versionNum}'
+    $ProjPackageZipVersionPath  = Join-Path $ProjDeliveryPath  '${ProjectName}.${versionNum}.zip'
   
-    $ProjBuildDateTime = $now.ToString("yyyy-MM-ddTHH-mm")
-    $ProjVersionPath = Join-Path $ProjTopdir   "${ProjectName}.Build.Number"
-    $ProjModulePath = Join-Path $ProjBuildPath "md2html"
-    $ProjHistoryPath = Join-Path $ProjModulePath  "${ProjectName}.history.txt"
+    $ProjBuildDateTime          = $now.ToString("yyyy-MM-ddTHH-mm")
+    $ProjVersionPath            = Join-Path $ProjTopdir   "${ProjectName}.Build.Number"
+    $ProjModulePath             = Join-Path $ProjBuildPath "md2html"
+    $ProjHistoryPath            = Join-Path $ProjModulePath  "${ProjectName}.history.txt"
   
-    $ProjHistorySinceDate = "2015-05-01"
-    $ProjNuspecPath = Join-Path $ProjTopdir "${ProjectName}.nuspec"
-    $ProjNuspecPkgVersionPath = Join-Path $ProjDistPath  '${ProjectName}.${versionNum}.nupkg'
+    $ProjHistorySinceDate       = "2015-05-01"
+    $ProjNuspecPath             = Join-Path $ProjTopdir "${ProjectName}.nuspec"
+    $ProjNuspecPkgVersionPath   = Join-Path $ProjDistPath  '${ProjectName}.${versionNum}.nupkg'
 
     Set-Variable -Name "sdlc" -Description "System Development Lifecycle Environment" -Value "UNKNOWN"
     $zipArgs = 'a -bb2 -tzip "{0}" -ir0@"{1}"' -f $ProjPackageZipPath, $ProjPackageListPath # Get paths from file
