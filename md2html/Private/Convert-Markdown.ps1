@@ -61,7 +61,7 @@ function Convert-Markdown
             'autolinks' ## .UseAutoLinks()
             'attributes' ## .UseGenericAttributes();
         )
-        ## configure the Markdig pipeline
+        <## configure the Markdig pipeline
         [Markdig.MarkdownPipelineBuilder]$pipelineBuilder = (New-Object Markdig.MarkdownPipelineBuilder)
         Write-Verbose "Adding Markdig parser extensions .UseAutoIdentifiers(GitHub)"
         $pipelineBuilder = [Markdig.MarkDownExtensions]::UseAutoIdentifiers($pipelineBuilder, [Markdig.Extensions.AutoIdentifiers.AutoIdentifierOptions]::GitHub)
@@ -69,6 +69,18 @@ function Convert-Markdown
         $pipelineBuilder = [Markdig.MarkDownExtensions]::Configure($pipelineBuilder, [string]::Join('+', $advancedMarkdownExtensions))
         Write-verbose "Building Markdig pipeline"
         $pipeline = $pipelineBuilder.Build()
+        ##>
+    
+    ##    // Configure the pipeline with all advanced extensions active
+    [Markdig.MarkdownPipelineBuilder]$pipelineBuilder = (New-Object Markdig.MarkdownPipelineBuilder)
+    $pipeline = [Markdig.MarkDownExtensions]::UseAdvancedExtensions($pipelineBuilder)
+    $pipeline = $pipelineBuilder.Build()
+    ##>
+    <#
+    $pipelineBuilder = [Markdig.MarkdownPipelineBuilder]::new()
+    $pipeline = [Markdig.MarkDownExtensions]::UseAdvancedExtensions($pipelineBuilder)
+    $pipeline = $pipelineBuilder.Build()
+    ##>
     #endregion Initialize
     
     #region setup
@@ -109,6 +121,8 @@ function Convert-Markdown
           [void]$sb.AppendLine("<head>")
           [void]$sb.AppendLine('<meta charset="utf-8">')
           [void]$sb.AppendLine('<meta http-equiv="x-ua-compatible" content="ie=edge">')
+          [void]$sb.AppendLine('<meta http-equiv="expires" content="0"> <!-- Never caches the page -->')
+          [void]$sb.AppendLine('<link rel="shortcut icon" type="image/jpg" href="favicon.png"/>')
           [void]$sb.AppendLine("<title>$Name</title>")
           if ($CssPath)
           {
