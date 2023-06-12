@@ -2,6 +2,7 @@
 param
 (
 )
+
 <#
 Module Manifest Tests
 
@@ -46,9 +47,8 @@ $(Get-Module $ModuleName).ExportedCommands | Sort-Object | Out-String | Write-Ve
 
 
 Describe "Manifest" {
-  
-    $ManifestHash = Invoke-Expression (Get-Content $ManifestPath -Raw)
-  
+
+    $ManifestHash = Import-PowerShellDataFile -Path $ManifestPath
     It "has a valid manifest" {
         {
             $null = Test-ModuleManifest -Path $ManifestPath -ErrorAction Stop -WarningAction SilentlyContinue

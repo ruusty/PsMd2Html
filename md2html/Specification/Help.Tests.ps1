@@ -20,7 +20,7 @@ $Script:ModuleName = $Script:ModuleName = Get-ChildItem $ModuleRoot\*\*.psm1 | S
 
 Write-Verbose $('{0}:{1}' -f '$ModuleName', $ModuleName)
 
-$ModulePath = (Resolve-Path -path $(Join-Path $PSScriptRoot "..")).Path
+$ModulePath = $(Resolve-Path -path $(Join-Path $PSScriptRoot "..")).Path
 Write-Verbose $('{0}:{1}' -f '$ModulePath', $ModulePath)
 
 $ManifestPath = "$ModulePath\$ModuleName.psd1"
@@ -32,7 +32,7 @@ $manifest = Import-PowerShellDataFile -Path $manifestPath
 # Remove all versions of the module from the session. Pester can't handle multiple versions.
 Remove-Module -Name $ModuleName -Force
 Import-Module -Name $manifestPath -Force -Verbose:$false -ErrorAction Stop
-$commands = Get-Command -Module $ModuleName -CommandType Cmdlet, Function, Workflow  # Not alias
+$commands = Get-Command -Module $ModuleName -CommandType "Cmdlet","Function"  # Not alias
 
 ## When testing help, remember that help is cached at the beginning of each session.
 ## To test, restart session.
