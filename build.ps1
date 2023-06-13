@@ -22,5 +22,5 @@ $params = @{
 
 $props = @{
 }
-
+import-module -RequiredVersion 4.6.0 pester
 Invoke-psake -nologo -buildFile build.psakefile.ps1 -parameters $params -properties $props -taskList $tasklist

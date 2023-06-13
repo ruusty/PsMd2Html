@@ -21,7 +21,6 @@ filter Skip-Empty { $_ | Where-Object { $_ -ne $null -and $_ } }
 $IsVerbose = $false
 $PSBoundParameters | Out-String | Write-Verbose -verbose:$IsVerbose
 
-import-module -RequiredVersion 4.6.0 pester
 Import-Module "$PSScriptRoot\md2html"
 Import-Module Ruusty.ReleaseUtilities -verbose:$IsVerbose
 
