@@ -29,11 +29,7 @@ if(!($psModulePath.Split(';').Contains($installRootDirPath))){
     $psModulePath = $psModulePath + ";$installRootDirPath"
     # save
     Install-ChocolateyEnvironmentVariable -variableName "PSModulePath" -variableValue $psModulePath -variableType 'Machine'
-    # make effective in current session
-    #$env:PSModulePath = $env:PSModulePath + ";$installModulesDirPath"
 }
-  Install-ChocolateyPowershellModule -packageName $env:chocolateyPackageName -psModuleFullPath $(join-path $installRootDirPath $moduleName) -cmdName "md2html"
-
 }
 
 begin {
