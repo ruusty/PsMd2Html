@@ -17,8 +17,8 @@ FormatTaskName "`r`n[------{0}------]`r`n"
 $IsVerbose              = ($VerbosePreference -eq 'Continue')
 $PSBoundParameters | Out-String | Write-Verbose -verbose:$IsVerbose
 
-import-module -RequiredVersion 4.6.0 pester
 Import-Module "$PSScriptRoot\md2html"
+import-module -RequiredVersion 4.6.0 pester
 Import-Module Ruusty.ReleaseUtilities -verbose:$IsVerbose
 
 <#
@@ -56,7 +56,7 @@ function Get-SettingFromXML
     Throw "XML error"
   }
 }
-FormatTaskName "`r`n[------{0}------]`r`n"
+
 Properties {
   Write-Verbose "Verbose is ON"
   Write-Host $('{0} ==> {1}' -f '$VerbosePreference', $VerbosePreference)
