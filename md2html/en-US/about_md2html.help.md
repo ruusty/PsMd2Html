@@ -1,6 +1,75 @@
+# md2html #
+## about_md2html ##
+
+
+
+~~~text
+ABOUT TOPIC NOTE:
+The first header of the about topic should be the topic name.
+The second header contains the lookup name used by the help system.
+
+IE:
+# Some Help Topic Name #
+## SomeHelpTopicFileName ##
+
+This will be transformed into the text file
+as `about_SomeHelpTopicFileName`.
+Do not include file extensions.
+The second header should have no spaces.
+~~~
+
+# SHORT DESCRIPTION #
+{{ Short Description Placeholder }}
+
+~~~text
+ABOUT TOPIC NOTE:
+About topics can be no longer than 80 characters wide when rendered to text.
+Any topics greater than 80 characters will be automatically wrapped.
+The generated about topic will be encoded UTF-8.
+~~~
+
+# LONG DESCRIPTION #
+{{ Long Description Placeholder }}
+
+## Optional Subtopics ##
+{{ Optional Subtopic Placeholder }}
+
+# EXAMPLES #
+{{ Code or descriptive examples of how to leverage the functions described. }}
+
+# NOTE #
+{{ Note Placeholder - Additional information that a user needs to know.}}
+
+# TROUBLESHOOTING NOTE #
+{{ Troubleshooting Placeholder - Warns users of bugs}}
+
+{{ Explains behaviour that is likely to change with fixes }}
+
+# SEE ALSO #
+
+- 
+
+# KEYWORDS #
+{{List alternate names or titles for this topic that readers might use.}}
+
+- {{ Keyword Placeholder }}
+- {{ Keyword Placeholder }}
+- {{ Keyword Placeholder }}
+- {{ Keyword Placeholder }}
+
 # md2html <!-- omit in toc --> #
 
 
+- [md2html](#md2html)
+  - [about\_md2html](#about-md2html)
+- [SHORT DESCRIPTION](#short-description)
+- [LONG DESCRIPTION](#long-description)
+  - [Optional Subtopics](#optional-subtopics)
+- [EXAMPLES](#examples)
+- [NOTE](#note)
+- [TROUBLESHOOTING NOTE](#troubleshooting-note)
+- [SEE ALSO](#see-also)
+- [KEYWORDS](#keywords)
 - [md2html ](#md2html-omit-in-toc)
   - [Description](#description)
   - [Powershell Usage](#powershell-usage)
@@ -116,12 +185,12 @@ powershell -NoProfile -ExecutionPolicy unrestricted import-module -verbose md2ht
 
 : Another Sample grid table.
 
-| Fruit         | Price         | Advantages         |
-|---:           |:------:       |:----               |
-| Bananas       | $1.34         | - built-in wrapper |
-|               |               | - bright color     |
-| Oranges       | $2.10         | - cures scurvy     |
-|               |               | - tasty            |
+|   Fruit | Price | Advantages         |
+|--------:|:-----:|:-------------------|
+| Bananas | $1.34 | - built-in wrapper |
+|         |       | - bright color     |
+| Oranges | $2.10 | - cures scurvy     |
+|         |       | - tasty            |
 
 Three consecutive dots ... into an ellipsis entity
 
