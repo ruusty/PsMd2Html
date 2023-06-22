@@ -1,26 +1,21 @@
 # md2html <!-- omit in toc --> #
 
-~~~plaintext
-Version:        4.3.6415.8603
-Date:           2017-05-15T23-53
-~~~
 
-<a name="TOC"></a>
+- [md2html ](#md2html-omit-in-toc)
+  - [Description](#description)
+  - [Powershell Usage](#powershell-usage)
+    - [Example Usage](#example-usage)
+      - [Module Commands](#module-commands)
+      - [Get help](#get-help)
+  - [Cmd Usage](#cmd-usage)
+  - [Markdown Examples](#markdown-examples)
+  - [Markdig](#markdig)
+  - [CommonMark](#commonmark)
+  - [Resources](#resources)
+  - [highlightjs](#highlightjs)
+  - [Changes](#changes)
 
-- [Description](#description)
-- [Powershell Usage](#powershell-usage)
-  - [Example Usage](#example-usage)
-    - [Module Commands](#module-commands)
-    - [Get help](#get-help)
-- [Cmd Usage](#cmd-usage)
-- [Markdown Examples](#markdown-examples)
-- [Markdig](#markdig)
-- [CommonMark](#commonmark)
-- [Resources](#resources)
-- [highlightjs](#highlightjs)
-- [Changes](#changes)
 
-[&uarr;](#TOC)
 
 ## Description ##
 
@@ -28,7 +23,7 @@ md2html is a PowerShell module to automate converting Markdown files into html f
 
 Uses the __[Markdig](https://github.com/lunet-io/markdig)__ CommonMark compliant, extensible Markdown processor for .NET.
 
-[&uarr;](#TOC)
+[&uarr;](#top)
 
 ## Powershell Usage ##
 
