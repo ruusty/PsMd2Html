@@ -1,4 +1,3 @@
-md2html\about_md2html.help.txt
 md2html\Data\highlight.pack.js
 md2html\Data\markdown.css
 md2html\Data\markdown.min.css
@@ -7,6 +6,9 @@ md2html\Data\markdownpad-github.min.css
 md2html\Data\none.css
 md2html\Data\vs.css
 md2html\Data\vs.min.css
+md2html\en-US\about_md2html.help.html
+md2html\en-US\about_md2html.help.md
+md2html\en-US\about_md2html.help.txt
 md2html\example\github-flavored-markdown.sample_content.html
 md2html\example\github-flavored-markdown.sample_content.md
 md2html\example\Grid-Table-generator.html
@@ -25,7 +27,3 @@ md2html\Private\Convert-Markdown.ps1
 md2html\Private\Get-ConfigData.ps1
 md2html\Public\Convert-Markdown2Html.ps1
 md2html\Public\Convert-Markdown2Pdf.ps1
-md2html\README.html
-md2html\README.md
-md2html\TECHNOTES.html
-md2html\TECHNOTES.md

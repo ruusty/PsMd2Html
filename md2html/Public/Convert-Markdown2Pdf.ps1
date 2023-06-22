@@ -1,7 +1,7 @@
 <#
     .SYNOPSIS
         Convert Markdown files to pdf
-    
+
     .DESCRIPTION
         Convert Markdown files to html then to pdf using wkhtmltopdf.exe
         from Markdown Monster
@@ -9,18 +9,25 @@
     .PARAMETER Path
         Wildcard filespec of Markdown files
 
+  .PARAMETER Recurse
+    Recurse directories for Markdown files using Path
+
     .PARAMETER wkhtmltopdf
         Path to wkhtmltopdf executable
 
-    .EXAMPLE
+    .PARAMETER WkhtmltopdfArgumentList
+        Arguments passed to wkhtmltopdf executable
+
+        .EXAMPLE
         convert-Markdown2pdf -path *.md
 
 #>
-function convert-Markdown2pdf {
+function Convert-Markdown2Pdf {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param (    
         [Parameter(Position = 1)]
         [string]$Path = "*.md"
+       ,[switch]$Recurse
        ,[string]$wkhtmltopdf = "C:\Users\Russell\AppData\Local\Markdown Monster\BinSupport\wkhtmltopdf.exe" 
        ,[Alias('ArgList')]
         [String[]] $WkhtmltopdfArgumentList = (
@@ -55,10 +62,16 @@ function convert-Markdown2pdf {
         Write-Verbose $('{0}=={1}' -f '$PSScriptRoot', $PSScriptRoot)
     }
     Process {
-        Convert-Markdown2Html -path $Path -Verbose:$IsVerbose -WhatIf:$WhatIfPreference
-        Resolve-Path -Path $Path -Relative | ForEach-Object {
-            $htmlPath = [System.IO.path]::ChangeExtension($_, "html")
-            $pdfPath  = [System.IO.path]::ChangeExtension($_, "pdf")
+        $GetChildItemArgs = @{ Path = $Path };
+        if ($Recurse) {
+            $GetChildItemArgs += @{ recurse = $Recurse }
+        }
+        Convert-Markdown2Html @GetChildItemArgs  -Verbose:$IsVerbose -WhatIf:$WhatIfPreference
+        Get-ChildItem @GetChildItemArgs -File -Exclude "*.html" | Sort-Object -unique 
+        | ForEach-Object {
+            if ($([system.io.path]::GetExtension($_.FullName)) -in @(".md", ".markdown")) {
+            $htmlPath = [System.IO.path]::ChangeExtension($_.FullName, "html")
+            $pdfPath  = [System.IO.path]::ChangeExtension($_.FullName, "pdf")
             write-verbose $("{0}==>{1}" -f $htmlPath, $pdfPath)
             try {
                 if ($PSCmdlet.ShouldProcess(
@@ -77,6 +90,7 @@ function convert-Markdown2pdf {
             finally {
                 Start-Sleep -Milliseconds 100;
             }
-        }
+           } 
+        }  
     }
 }

@@ -23,5 +23,7 @@ Foreach ($import in @($Public + $Private))
 # Export Public functions ($Public.BaseName) for WIP modules
 # Set variables visible to the module and its functions only
 
-Set-Alias -name md2Html -value convert-Markdown2Html -Description "Backward compatibility V2"
+Set-Alias -name md2Html -value Convert-Markdown2Html -Description "Backward compatibility V2"
+Set-Alias -name md2pdf -value convert-Markdown2pdf
+
 Export-ModuleMember -Function $Public.Basename

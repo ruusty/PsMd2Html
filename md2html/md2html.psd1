@@ -112,7 +112,7 @@ Module Name: md2html
 			# IconUri = ''
 
 			# ReleaseNotes of this module
-			 ReleaseNotes = 'Hellow'
+			 ReleaseNotes = 'Hello'
 
 		} # End of PSData hashtable
 		#Configuration for module cmdlets

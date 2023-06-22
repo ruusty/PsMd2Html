@@ -1,82 +1,12 @@
-# md2html #
-## about_md2html ##
+# md2html <!-- omit in top --> 
 
-
-
-~~~text
-ABOUT TOPIC NOTE:
-The first header of the about topic should be the topic name.
-The second header contains the lookup name used by the help system.
-
-IE:
-# Some Help Topic Name #
-## SomeHelpTopicFileName ##
-
-This will be transformed into the text file
-as `about_SomeHelpTopicFileName`.
-Do not include file extensions.
-The second header should have no spaces.
-~~~
-
-# SHORT DESCRIPTION #
-{{ Short Description Placeholder }}
-
-~~~text
-ABOUT TOPIC NOTE:
-About topics can be no longer than 80 characters wide when rendered to text.
-Any topics greater than 80 characters will be automatically wrapped.
-The generated about topic will be encoded UTF-8.
-~~~
-
-# LONG DESCRIPTION #
-{{ Long Description Placeholder }}
-
-## Optional Subtopics ##
-{{ Optional Subtopic Placeholder }}
-
-# EXAMPLES #
-{{ Code or descriptive examples of how to leverage the functions described. }}
-
-# NOTE #
-{{ Note Placeholder - Additional information that a user needs to know.}}
-
-# TROUBLESHOOTING NOTE #
-{{ Troubleshooting Placeholder - Warns users of bugs}}
-
-{{ Explains behaviour that is likely to change with fixes }}
-
-# SEE ALSO #
-
-- 
-
-# KEYWORDS #
-{{List alternate names or titles for this topic that readers might use.}}
-
-- {{ Keyword Placeholder }}
-- {{ Keyword Placeholder }}
-- {{ Keyword Placeholder }}
-- {{ Keyword Placeholder }}
-
-# md2html <!-- omit in toc --> #
-
-
-- [md2html](#md2html)
-  - [about\_md2html](#about-md2html)
+- [md2html ](#md2html-omit-in-top)
 - [SHORT DESCRIPTION](#short-description)
-- [LONG DESCRIPTION](#long-description)
-  - [Optional Subtopics](#optional-subtopics)
 - [EXAMPLES](#examples)
 - [NOTE](#note)
 - [TROUBLESHOOTING NOTE](#troubleshooting-note)
 - [SEE ALSO](#see-also)
 - [KEYWORDS](#keywords)
-- [md2html ](#md2html-omit-in-toc)
-  - [Description](#description)
-  - [Powershell Usage](#powershell-usage)
-    - [Example Usage](#example-usage)
-      - [Module Commands](#module-commands)
-      - [Get help](#get-help)
-  - [Cmd Usage](#cmd-usage)
   - [Markdown Examples](#markdown-examples)
   - [Markdig](#markdig)
   - [CommonMark](#commonmark)
@@ -84,17 +14,14 @@ The generated about topic will be encoded UTF-8.
   - [highlightjs](#highlightjs)
   - [Changes](#changes)
 
+# SHORT DESCRIPTION #
+
+md2html is a PowerShell module to automate converting Markdown files into html files and pdf files.
+
+Uses the [Markdig](https://github.com/lunet-io/markdig)__ CommonMark compliant, extensible Markdown processor for .NET.
 
 
-## Description ##
-
-md2html is a PowerShell module to automate converting Markdown files into html files.
-
-Uses the __[Markdig](https://github.com/lunet-io/markdig)__ CommonMark compliant, extensible Markdown processor for .NET.
-
-[&uarr;](#top)
-
-## Powershell Usage ##
+# EXAMPLES #
 
 ~~~powershell
 convert-Markdown2Html -path *.md
@@ -108,7 +35,7 @@ convert-Markdown2Html -path *.md
 "*.md", 'README*.md', "..\Specification\*.md", "..\Specification\*.md" | Convert-Markdown2Html -verbose -recurse -HighlightLocal
 ~~~
 
-### Example Usage ###
+Using alias
 
 ~~~powershell
 md2html -verbose -recurse
@@ -118,11 +45,30 @@ md2html -verbose -recurse
 Convert-md2html -verbose -recurse
 ~~~
 
-```dos
-md2html -verbose -recurse
+
+# NOTE #
+
+Uses `wkhtmltopdf.exe` included with *Markdown Monster*
+
+# TROUBLESHOOTING NOTE #
+
+```powershell
+import-module md2html -verbose
+get-module md2html | select -expand ExportedCommands
+$(get-module md2html).ExportedCommands.Keys
 ```
 
-#### Module Commands ####
+Installed here  
+
+```powershell
+$installRootDirPath =  Join-Path -Path $(Join-Path -Path $([Environment]::GetFolderPath('MyDocuments') ) -ChildPath "PowerShell") -ChildPath "Modules"
+```
+
+```powershell
+import-module  d:\Users\Russell\Documents\PowerShell\Modules\ms2html\md2html.psd1
+```
+
+Get help
 
 ```powershell
 import-module md2html -verbose
@@ -142,28 +88,26 @@ get-module md2html | select -expand ExportedCommands
 $(get-module md2html).ExportedCommands.Keys
 ~~~
 
-#### Get help ####
+
+# SEE ALSO #
 
 ```powershell
 $(get-module md2html).ExportedCommands.Keys |% {get-help $_}
 ```
-
-[&uarr;](#TOC)
-
-## Cmd Usage ##
-
-~~~dos
-md2html
-~~~
-
-`md2html.bat` is installed by _Chocolatey_
 
 ~~~powershell
 @echo off
 powershell -NoProfile -ExecutionPolicy unrestricted import-module -verbose md2html\Convert-Markdown2Html  
 ~~~
 
-[&uarr;](#TOC)
+
+# KEYWORDS #
+
+- Markdown
+- Markdig
+
+
+[&uarr;](#top)
 
 ## Markdown Examples ##
 
@@ -206,13 +150,13 @@ Three consecutive dots ... into an ellipsis entity
 This is a spoiler
 :::
 
-[&uarr;](#TOC)
+[&uarr;](#top)
 
 ## Markdig ##
 
 The  [Markdig.Signed](https://www.nuget.org/packages/Markdig.Signed/) NuGet package provides the _net40_ signed assemblies.
 
-[&uarr;](#TOC)
+[&uarr;](#top)
 
 ## CommonMark ##
 
@@ -221,7 +165,7 @@ The  [Markdig.Signed](https://www.nuget.org/packages/Markdig.Signed/) NuGet pack
 - CommonMark __[code](http://code.commonmark.org)__ on GitHub.
 - The official __[dingus](http://try.commonmark.org)__ which allows people to experiment.
 
-[&uarr;](#TOC)
+[&uarr;](#top)
 
 ## Resources ##
 
@@ -234,14 +178,14 @@ The  [Markdig.Signed](https://www.nuget.org/packages/Markdig.Signed/) NuGet pack
 - <https://www.markdownguide.org/extended-syntax/>
 - <http://www.tablesgenerator.com/markdown_tables>
 
-[&uarr;](#TOC)
+[&uarr;](#top)
 
 ## highlightjs ##
 
 - <https://highlightjs.org/download/>
 - <https://highlightjs.readthedocs.io/en/latest/>
 
-[&uarr;](#TOC)
+[&uarr;](#top)
 
 ## Changes ##
 
@@ -251,4 +195,4 @@ The  [Markdig.Signed](https://www.nuget.org/packages/Markdig.Signed/) NuGet pack
 - 2019-02-14
   - Markdig.dll markdig.signed.0.15.7.0
 
-[&uarr;](#TOC)
+[&uarr;](#top)
