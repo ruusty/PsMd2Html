@@ -9,7 +9,7 @@
     .PARAMETER Path
         Wildcard filespec of Markdown files
 
-  .PARAMETER Recurse
+    .PARAMETER Recurse
     Recurse directories for Markdown files using Path
 
     .PARAMETER wkhtmltopdf
@@ -18,8 +18,15 @@
     .PARAMETER WkhtmltopdfArgumentList
         Arguments passed to wkhtmltopdf executable
 
-        .EXAMPLE
+    .EXAMPLE
         convert-Markdown2pdf -path *.md
+
+        Markdown files in the current directory
+
+    .EXAMPLE
+    Convert-Markdown2pdf -Path *.md -recurse -whatif
+
+    Markdown files in the current directory and subdirectories
 
 #>
 function Convert-Markdown2Pdf {
