@@ -17,7 +17,7 @@ FormatTaskName "`r`n[------{0}------]`r`n"
 $IsVerbose              = ($VerbosePreference -eq 'Continue')
 $PSBoundParameters | Out-String | Write-Verbose -verbose:$IsVerbose
 
-Import-Module "$PSScriptRoot\md2html"
+
 import-module -RequiredVersion 4.6.0 pester
 Import-Module Ruusty.ReleaseUtilities -verbose:$IsVerbose
 
@@ -281,6 +281,7 @@ task Compile -description "Build Deliverable zip file" -depends create-dirs, set
   }
 
   Write-Host "Attempting to Convert Markdown to Html"
+  Import-Module "$PSScriptRoot\md2html"
   Convert-Markdown2Html -path $ProjBuildPath -recurse -verbose
 
   Write-Host "Attempting to create zip file with '$zipArgs'"
