@@ -116,8 +116,6 @@ function Convert-Markdown
           $sb = New-Object System.Text.StringBuilder
           [void]$sb.AppendLine('<!doctype html>')
           [void]$sb.AppendLine('<html>')
-          [void]$sb.AppendLine("<!-- Generated {0} by [Markdig.Markdown]::ToHtml -->" -f $([System.DateTime]::Now))
-          [void]$sb.AppendLine("<!-- Generated from {0} -->" -f $mdfile.fullname)
           [void]$sb.AppendLine("<head>")
           [void]$sb.AppendLine('<meta charset="utf-8">')
           [void]$sb.AppendLine('<meta http-equiv="x-ua-compatible" content="ie=edge">')

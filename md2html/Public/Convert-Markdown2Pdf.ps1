@@ -35,7 +35,7 @@ function Convert-Markdown2Pdf {
         [Parameter(Position = 1)]
         [string]$Path = "*.md"
        ,[switch]$Recurse
-       ,[string]$wkhtmltopdf = "C:\Users\Russell\AppData\Local\Markdown Monster\BinSupport\wkhtmltopdf.exe" 
+       ,[string]$wkhtmltopdf = "$env:USERPROFILE\AppData\Local\Markdown Monster\BinSupport\wkhtmltopdf.exe" 
        ,[Alias('ArgList')]
         [String[]] $WkhtmltopdfArgumentList = (
             "--enable-local-file-access",

@@ -71,6 +71,80 @@
             </summary>
             <seealso cref="T:Markdig.Renderers.Html.HtmlObjectRenderer`1" />
         </member>
+        <member name="T:Markdig.Extensions.Alerts.AlertBlock">
+            <summary>
+            A block representing an alert quote block.
+            </summary>
+        </member>
+        <member name="M:Markdig.Extensions.Alerts.AlertBlock.#ctor(Markdig.Helpers.StringSlice)">
+            <summary>
+            Creates a new instance of this block.
+            </summary>
+            <param name="kind"></param>
+        </member>
+        <member name="P:Markdig.Extensions.Alerts.AlertBlock.Kind">
+            <summary>
+            Gets or sets the kind of the alert block (e.g `NOTE`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`)
+            </summary>
+        </member>
+        <member name="P:Markdig.Extensions.Alerts.AlertBlock.TriviaSpaceAfterKind">
+            <summary>
+            Gets or sets the trivia space after the kind.
+            </summary>
+        </member>
+        <member name="T:Markdig.Extensions.Alerts.AlertBlockRenderer">
+            <summary>
+            A HTML renderer for a <see cref="T:Markdig.Extensions.Alerts.AlertBlock"/>.
+            </summary>
+            <seealso cref="T:Markdig.Renderers.Html.HtmlObjectRenderer`1" />
+        </member>
+        <member name="M:Markdig.Extensions.Alerts.AlertBlockRenderer.#ctor">
+            <summary>
+            Creates a new instance of this renderer.
+            </summary>
+        </member>
+        <member name="P:Markdig.Extensions.Alerts.AlertBlockRenderer.RenderKind">
+            <summary>
+            Gets of sets a delegate to render the kind of the alert.
+            </summary>
+        </member>
+        <member name="M:Markdig.Extensions.Alerts.AlertBlockRenderer.Write(Markdig.Renderers.HtmlRenderer,Markdig.Extensions.Alerts.AlertBlock)">
+            <inheritdoc />
+        </member>
+        <member name="M:Markdig.Extensions.Alerts.AlertBlockRenderer.DefaultRenderKind(Markdig.Renderers.HtmlRenderer,Markdig.Helpers.StringSlice)">
+            <summary>
+            Renders the kind of the alert.
+            </summary>
+            <param name="renderer">The HTML renderer.</param>
+            <param name="kind">The kind of the alert to render</param>
+        </member>
+        <member name="T:Markdig.Extensions.Alerts.AlertExtension">
+            <summary>
+            Extension for adding alerts to a Markdown pipeline.
+            </summary>
+        </member>
+        <member name="P:Markdig.Extensions.Alerts.AlertExtension.RenderKind">
+            <summary>
+            Gets or sets the delegate to render the kind of the alert.
+            </summary>
+        </member>
+        <member name="M:Markdig.Extensions.Alerts.AlertExtension.Setup(Markdig.MarkdownPipelineBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Markdig.Extensions.Alerts.AlertExtension.Setup(Markdig.MarkdownPipeline,Markdig.Renderers.IMarkdownRenderer)">
+            <inheritdoc />
+        </member>
+        <member name="T:Markdig.Extensions.Alerts.AlertInlineParser">
+            <summary>
+            An inline parser for an alert inline (e.g. `[!NOTE]`).
+            </summary>
+            <seealso cref="T:Markdig.Parsers.InlineParser" />
+        </member>
+        <member name="M:Markdig.Extensions.Alerts.AlertInlineParser.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Markdig.Extensions.Alerts.AlertInlineParser"/> class.
+            </summary>
+        </member>
         <member name="T:Markdig.Extensions.AutoIdentifiers.AutoIdentifierExtension">
             <summary>
             The auto-identifier extension
@@ -145,6 +219,12 @@
             </summary>
         </member>
         <member name="T:Markdig.Extensions.AutoLinks.AutoLinkExtension">
+            <summary>
+            Extension to automatically create <see cref="T:Markdig.Syntax.Inlines.LinkInline"/> when a link url http: or mailto: is found.
+            </summary>
+            <seealso cref="T:Markdig.IMarkdownExtension" />
+        </member>
+        <member name="M:Markdig.Extensions.AutoLinks.AutoLinkExtension.#ctor(Markdig.Extensions.AutoLinks.AutoLinkOptions)">
             <summary>
             Extension to automatically create <see cref="T:Markdig.Syntax.Inlines.LinkInline"/> when a link url http: or mailto: is found.
             </summary>
@@ -1108,6 +1188,11 @@
             Internal state used by the <see cref="T:Markdig.Extensions.Tables.GridTableParser"/>
             </summary>
         </member>
+        <member name="M:Markdig.Extensions.Tables.GridTableState.#ctor(System.Int32,System.Boolean)">
+            <summary>
+            Internal state used by the <see cref="T:Markdig.Extensions.Tables.GridTableParser"/>
+            </summary>
+        </member>
         <member name="P:Markdig.Extensions.Tables.GridTableState.ColumnSlice.Start">
             <summary>
             Gets or sets the index position of this column (after the |)
@@ -1198,7 +1283,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Markdig.Extensions.Tables.PipeTableParser" /> class.
             </summary>
-            <param name="lineBreakParser">The linebreak parser to use</param>
+            <param name="lineBreakParser">The line break parser to use</param>
             <param name="options">The options.</param>
         </member>
         <member name="P:Markdig.Extensions.Tables.PipeTableParser.Options">
@@ -2487,7 +2572,7 @@
         </member>
         <member name="M:Markdig.Markdown.ToPlainText(System.String,Markdig.MarkdownPipeline,Markdig.MarkdownParserContext)">
             <summary>
-            Converts a Markdown string to HTML.
+            Converts a Markdown string to Plain text by using a <see cref="T:System.IO.StringWriter"/> .
             </summary>
             <param name="markdown">A Markdown text.</param>
             <param name="pipeline">The pipeline used for the conversion.</param>
@@ -2521,6 +2606,14 @@
             Uses all extensions except the BootStrap, Emoji, SmartyPants and soft line as hard line breaks extensions.
             </summary>
             <param name="pipeline">The pipeline.</param>
+            <returns>The modified pipeline</returns>
+        </member>
+        <member name="M:Markdig.MarkdownExtensions.UseAlertBlocks(Markdig.MarkdownPipelineBuilder,System.Action{Markdig.Renderers.HtmlRenderer,Markdig.Helpers.StringSlice})">
+            <summary>
+            Uses this extension to enable alert blocks.
+            </summary>
+            <param name="pipeline">The pipeline.</param>
+            <param name="renderKind">Replace the default renderer for the kind with a custom renderer</param>
             <returns>The modified pipeline</returns>
         </member>
         <member name="M:Markdig.MarkdownExtensions.UseAutoLinks(Markdig.MarkdownPipelineBuilder,Markdig.Extensions.AutoLinks.AutoLinkOptions)">
@@ -3635,6 +3728,14 @@
             <param name="sliceOffset">The slice offset.</param>
             <returns>The source position</returns>
         </member>
+        <member name="M:Markdig.Parsers.InlineProcessor.ReplaceParentContainer(Markdig.Syntax.ContainerBlock,Markdig.Syntax.ContainerBlock)">
+            <summary>
+            Replace a parent container. This method is experimental and should be used with caution.
+            </summary>
+            <param name="previousParentContainer">The previous parent container to replace</param>
+            <param name="newParentContainer">The new parent container</param>
+            <exception cref="T:System.InvalidOperationException">If a new parent container has been already setup.</exception>
+        </member>
         <member name="M:Markdig.Parsers.InlineProcessor.ProcessInlineLeaf(Markdig.Syntax.LeafBlock)">
             <summary>
             Processes the inline of the specified <see cref="T:Markdig.Syntax.LeafBlock"/>.
@@ -4047,121 +4148,6 @@
             Initializes a new instance of the <see cref="T:Markdig.Parsers.UnorderedListItemParser"/> class.
             </summary>
         </member>
-        <member name="T:Markdig.Renderers.HtmlRenderer">
-            <summary>
-            Default HTML renderer for a Markdown <see cref="T:Markdig.Syntax.MarkdownDocument"/> object.
-            </summary>
-            <seealso cref="T:Markdig.Renderers.TextRendererBase`1" />
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.#ctor(System.IO.TextWriter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Markdig.Renderers.HtmlRenderer"/> class.
-            </summary>
-            <param name="writer">The writer.</param>
-        </member>
-        <member name="P:Markdig.Renderers.HtmlRenderer.EnableHtmlForInline">
-            <summary>
-            Gets or sets a value indicating whether to output HTML tags when rendering. See remarks.
-            </summary>
-            <remarks>
-            This is used by some renderers to disable HTML tags when rendering some inline elements (for image links).
-            </remarks>
-        </member>
-        <member name="P:Markdig.Renderers.HtmlRenderer.EnableHtmlForBlock">
-            <summary>
-            Gets or sets a value indicating whether to output HTML tags when rendering. See remarks.
-            </summary>
-            <remarks>
-            This is used by some renderers to disable HTML tags when rendering some block elements (for image links).
-            </remarks>
-        </member>
-        <member name="P:Markdig.Renderers.HtmlRenderer.ImplicitParagraph">
-            <summary>
-            Gets or sets a value indicating whether to use implicit paragraph (optional &lt;p&gt;)
-            </summary>
-        </member>
-        <member name="P:Markdig.Renderers.HtmlRenderer.BaseUrl">
-            <summary>
-            Gets a value to use as the base url for all relative links
-            </summary>
-        </member>
-        <member name="P:Markdig.Renderers.HtmlRenderer.LinkRewriter">
-            <summary>
-            Allows links to be rewritten
-            </summary>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(System.String)">
-            <summary>
-            Writes the content escaped for HTML.
-            </summary>
-            <param name="content">The content.</param>
-            <returns>This instance</returns>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(Markdig.Helpers.StringSlice@,System.Boolean)">
-            <summary>
-            Writes the content escaped for HTML.
-            </summary>
-            <param name="slice">The slice.</param>
-            <param name="softEscape">Only escape &lt; and &amp;</param>
-            <returns>This instance</returns>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(Markdig.Helpers.StringSlice,System.Boolean)">
-            <summary>
-            Writes the content escaped for HTML.
-            </summary>
-            <param name="slice">The slice.</param>
-            <param name="softEscape">Only escape &lt; and &amp;</param>
-            <returns>This instance</returns>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(System.String,System.Int32,System.Int32,System.Boolean)">
-            <summary>
-            Writes the content escaped for HTML.
-            </summary>
-            <param name="content">The content.</param>
-            <param name="offset">The offset.</param>
-            <param name="length">The length.</param>
-            <param name="softEscape">Only escape &lt; and &amp;</param>
-            <returns>This instance</returns>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(System.ReadOnlySpan{System.Char},System.Boolean)">
-            <summary>
-            Writes the content escaped for HTML.
-            </summary>
-            <param name="content">The content.</param>
-            <param name="softEscape">Only escape &lt; and &amp;</param>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscapeUrl(System.String)">
-            <summary>
-            Writes the URL escaped for HTML.
-            </summary>
-            <param name="content">The content.</param>
-            <returns>This instance</returns>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteAttributes(Markdig.Syntax.MarkdownObject)">
-            <summary>
-            Writes the attached <see cref="T:Markdig.Renderers.Html.HtmlAttributes"/> on the specified <see cref="T:Markdig.Syntax.MarkdownObject"/>.
-            </summary>
-            <param name="markdownObject">The object.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteAttributes(Markdig.Renderers.Html.HtmlAttributes,System.Func{System.String,System.String})">
-            <summary>
-            Writes the specified <see cref="T:Markdig.Renderers.Html.HtmlAttributes"/>.
-            </summary>
-            <param name="attributes">The attributes to render.</param>
-            <param name="classFilter">A class filter used to transform a class into another class at writing time</param>
-            <returns>This instance</returns>
-        </member>
-        <member name="M:Markdig.Renderers.HtmlRenderer.WriteLeafRawLines(Markdig.Syntax.LeafBlock,System.Boolean,System.Boolean,System.Boolean)">
-            <summary>
-            Writes the lines of a <see cref="T:Markdig.Syntax.LeafBlock"/>
-            </summary>
-            <param name="leafBlock">The leaf block.</param>
-            <param name="writeEndOfLines">if set to <c>true</c> write end of lines.</param>
-            <param name="escape">if set to <c>true</c> escape the content for HTML</param>
-            <param name="softEscape">Only escape &lt; and &amp;</param>
-            <returns>This instance</returns>
-        </member>
         <member name="T:Markdig.Renderers.Html.CodeBlockRenderer">
             <summary>
             An HTML renderer for a <see cref="T:Markdig.Syntax.CodeBlock"/> and <see cref="T:Markdig.Syntax.FencedCodeBlock"/>.
@@ -4403,6 +4389,121 @@
             A HTML renderer for a <see cref="T:Markdig.Syntax.ThematicBreakBlock"/>.
             </summary>
             <seealso cref="T:Markdig.Renderers.Html.HtmlObjectRenderer`1" />
+        </member>
+        <member name="T:Markdig.Renderers.HtmlRenderer">
+            <summary>
+            Default HTML renderer for a Markdown <see cref="T:Markdig.Syntax.MarkdownDocument"/> object.
+            </summary>
+            <seealso cref="T:Markdig.Renderers.TextRendererBase`1" />
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Markdig.Renderers.HtmlRenderer"/> class.
+            </summary>
+            <param name="writer">The writer.</param>
+        </member>
+        <member name="P:Markdig.Renderers.HtmlRenderer.EnableHtmlForInline">
+            <summary>
+            Gets or sets a value indicating whether to output HTML tags when rendering. See remarks.
+            </summary>
+            <remarks>
+            This is used by some renderers to disable HTML tags when rendering some inline elements (for image links).
+            </remarks>
+        </member>
+        <member name="P:Markdig.Renderers.HtmlRenderer.EnableHtmlForBlock">
+            <summary>
+            Gets or sets a value indicating whether to output HTML tags when rendering. See remarks.
+            </summary>
+            <remarks>
+            This is used by some renderers to disable HTML tags when rendering some block elements (for image links).
+            </remarks>
+        </member>
+        <member name="P:Markdig.Renderers.HtmlRenderer.ImplicitParagraph">
+            <summary>
+            Gets or sets a value indicating whether to use implicit paragraph (optional &lt;p&gt;)
+            </summary>
+        </member>
+        <member name="P:Markdig.Renderers.HtmlRenderer.BaseUrl">
+            <summary>
+            Gets a value to use as the base url for all relative links
+            </summary>
+        </member>
+        <member name="P:Markdig.Renderers.HtmlRenderer.LinkRewriter">
+            <summary>
+            Allows links to be rewritten
+            </summary>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(System.String)">
+            <summary>
+            Writes the content escaped for HTML.
+            </summary>
+            <param name="content">The content.</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(Markdig.Helpers.StringSlice@,System.Boolean)">
+            <summary>
+            Writes the content escaped for HTML.
+            </summary>
+            <param name="slice">The slice.</param>
+            <param name="softEscape">Only escape &lt; and &amp;</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(Markdig.Helpers.StringSlice,System.Boolean)">
+            <summary>
+            Writes the content escaped for HTML.
+            </summary>
+            <param name="slice">The slice.</param>
+            <param name="softEscape">Only escape &lt; and &amp;</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Writes the content escaped for HTML.
+            </summary>
+            <param name="content">The content.</param>
+            <param name="offset">The offset.</param>
+            <param name="length">The length.</param>
+            <param name="softEscape">Only escape &lt; and &amp;</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscape(System.ReadOnlySpan{System.Char},System.Boolean)">
+            <summary>
+            Writes the content escaped for HTML.
+            </summary>
+            <param name="content">The content.</param>
+            <param name="softEscape">Only escape &lt; and &amp;</param>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteEscapeUrl(System.String)">
+            <summary>
+            Writes the URL escaped for HTML.
+            </summary>
+            <param name="content">The content.</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteAttributes(Markdig.Syntax.MarkdownObject)">
+            <summary>
+            Writes the attached <see cref="T:Markdig.Renderers.Html.HtmlAttributes"/> on the specified <see cref="T:Markdig.Syntax.MarkdownObject"/>.
+            </summary>
+            <param name="markdownObject">The object.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteAttributes(Markdig.Renderers.Html.HtmlAttributes,System.Func{System.String,System.String})">
+            <summary>
+            Writes the specified <see cref="T:Markdig.Renderers.Html.HtmlAttributes"/>.
+            </summary>
+            <param name="attributes">The attributes to render.</param>
+            <param name="classFilter">A class filter used to transform a class into another class at writing time</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Markdig.Renderers.HtmlRenderer.WriteLeafRawLines(Markdig.Syntax.LeafBlock,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Writes the lines of a <see cref="T:Markdig.Syntax.LeafBlock"/>
+            </summary>
+            <param name="leafBlock">The leaf block.</param>
+            <param name="writeEndOfLines">if set to <c>true</c> write end of lines.</param>
+            <param name="escape">if set to <c>true</c> escape the content for HTML</param>
+            <param name="softEscape">Only escape &lt; and &amp;</param>
+            <returns>This instance</returns>
         </member>
         <member name="T:Markdig.Renderers.IMarkdownObjectRenderer">
             <summary>
@@ -4842,6 +4943,14 @@
             Writes the specified content.
             </summary>
             <param name="content">The content.</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Markdig.Renderers.TextRendererBase`1.Write(System.Char,System.Int32)">
+            <summary>
+            Writes the specified char repeated a specified number of times.
+            </summary>
+            <param name="c">The char to write.</param>
+            <param name="count">The number of times to write the char.</param>
             <returns>This instance</returns>
         </member>
         <member name="M:Markdig.Renderers.TextRendererBase`1.Write(Markdig.Helpers.StringSlice@)">
@@ -5575,6 +5684,15 @@
             <param name="descriptor">The descriptor.</param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="M:Markdig.Syntax.Inlines.EmphasisDelimiterInline.#ctor(Markdig.Parsers.InlineParser,Markdig.Parsers.Inlines.EmphasisDescriptor,Markdig.Helpers.StringSlice)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Markdig.Syntax.Inlines.EmphasisDelimiterInline" /> class.
+            </summary>
+            <param name="parser">The parser.</param>
+            <param name="descriptor">The descriptor.</param>
+            <param name="content">The content.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
         <member name="P:Markdig.Syntax.Inlines.EmphasisDelimiterInline.Descriptor">
             <summary>
             Gets the descriptor for this emphasis.
@@ -5588,6 +5706,11 @@
         <member name="P:Markdig.Syntax.Inlines.EmphasisDelimiterInline.DelimiterCount">
             <summary>
             The number of delimiter characters found for this delimiter.
+            </summary>
+        </member>
+        <member name="F:Markdig.Syntax.Inlines.EmphasisDelimiterInline.Content">
+            <summary>
+            The content as a <see cref="T:Markdig.Helpers.StringSlice"/>.
             </summary>
         </member>
         <member name="T:Markdig.Syntax.Inlines.EmphasisInline">
@@ -6432,7 +6555,7 @@
         </member>
         <member name="P:Markdig.Syntax.QuoteBlockLine.TriviaBefore">
             <summary>
-            Gets or sets trivia occuring before the first quote character.
+            Gets or sets trivia occurring before the first quote character.
             </summary>
         </member>
         <member name="P:Markdig.Syntax.QuoteBlockLine.QuoteChar">

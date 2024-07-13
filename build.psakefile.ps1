@@ -281,7 +281,7 @@ task Compile -description "Build Deliverable zip file" -depends create-dirs, set
   }
 
   Write-Host "Attempting to Convert Markdown to Html"
-  md2html\Convert-Markdown2Html -path $ProjBuildPath -recurse -verbose
+  Convert-Markdown2Html -path $ProjBuildPath -recurse -verbose
 
   Write-Host "Attempting to create zip file with '$zipArgs'"
   if (Test-Path -Path $ProjPackageZipPath -Type Leaf){ Remove-Item -path $ProjPackageZipPath}
