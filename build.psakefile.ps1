@@ -367,7 +367,7 @@ Task Distribute-nupkg-multi -description "Push multiple sdlc nupkg to Chocolatey
 
 
 Task clean-dirs {
-  if ((Test-Path $ProjBuildPath)) { Remove-Item $ProjBuildPath -Recurse -force }
+  if ((Test-Path $ProjBuildPath)) { Remove-Item $ProjBuildPath -Recurse -force -ErrorAction Continue }
   if ((Test-Path $ProjDistPath)) { Remove-Item $ProjDistPath -Recurse -force }
 }
 

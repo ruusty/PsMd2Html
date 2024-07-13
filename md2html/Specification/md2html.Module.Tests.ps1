@@ -191,40 +191,6 @@ Describe 'Convert-Markdown2Html' {
     }
 
 
-    #Need to support this in build scriptsconvertto-mdhtml
-   
-    It "Should support ConvertTo-mdHtml (test4)" `
-        -TestCases @(
-        @{Path = 'test4/*.md'; ReferencePath = 'test4/*.html' }
-    ) `
-    {
-        param($Path, $ReferencePath)
-        $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
-        $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
-        $testPath | Write-Verbose -verbose:$IsVerbose
-        convertTo-mdHtml -Path $testPath -recurse -verbose:$IsVerbose
-
-        $mdFiles = Get-ChildItem -path $testPath -Recurse 
-
-        $mdFiles | ForEach-Object {
-            $result = [System.IO.Path]::ChangeExtension($_.FullName, '.html')
-            $x = [System.IO.Path]::GetExtension($_.FullName)
-            $LastWriteTime = $_.LastWriteTime 
-            $CreationTime = $_.CreationTime
-            switch ($x) {
-                '.md' {  
-                    $result | Should  Exist
-                    ( $LastWriteTime -eq (Get-ChildItem -Path $result).LastWriteTime -and $CreationTime -eq (Get-ChildItem -Path $result).CreationTime)
-                }
-                '.txt' { $result | Should not Exist }
-                Default { }
-            }
-         
-        }
-
-        $htmlFiles = Get-ChildItem -path $refPath -Recurse 
-        $htmlFiles.Count | Should -BeExactly $mdFiles.Count
-    }
    
     # It should highlight
     It "Should Support code highlight (test5)" `
