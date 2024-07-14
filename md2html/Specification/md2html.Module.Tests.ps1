@@ -202,7 +202,7 @@ Describe 'Convert-Markdown2Html' {
         $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
         $testPath | Write-Verbose -verbose:$IsVerbose
-        convertTo-mdHtml -Path $testPath -Hilite -recurse -verbose:$IsVerbose
+        Convert-Markdown2Html -Path $testPath -Hilite -recurse -verbose:$IsVerbose
 
         $mdFiles = Get-ChildItem -path $testPath -Recurse 
 
@@ -235,7 +235,7 @@ Describe 'Convert-Markdown2Html' {
         $testPath = $Path -split ';' | ForEach-Object { Join-Path -Path $SCRIPT:UncPath -ChildPath $_ }
         $refPath = Join-Path $SCRIPT:UncPath -ChildPath $ReferencePath
         $testPath | Write-Verbose -verbose:$IsVerbose
-        $testPath | convertTo-mdHtml -Hilite -recurse -verbose:$IsVerbose
+        $testPath | Convert-Markdown2Html -Hilite -recurse -verbose:$IsVerbose
 
         $mdFiles = Get-ChildItem -path $testPath -Recurse 
 

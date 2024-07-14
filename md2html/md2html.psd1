@@ -85,7 +85,7 @@ Module Name: md2html
 	VariablesToExport = '*'
 
 	# Aliases to export from this module
-	AliasesToExport = '*' #For performanace, list alias explicity
+	AliasesToExport = @('md2Html','md2pdf') #For performanace, list alias explicity
 
 	# List of all modules packaged with this module
 	ModuleList = @()

@@ -30,7 +30,7 @@ $manifest = Import-PowerShellDataFile -Path $manifestPath
 
 # Get module commands
 # Remove all versions of the module from the session. Pester can't handle multiple versions.
-Remove-Module -Name $ModuleName -Force
+#Remove-Module -Name $ModuleName -Force
 Import-Module -Name $manifestPath -Force -Verbose:$false -ErrorAction Stop
 $commands = Get-Command -Module $ModuleName -CommandType "Cmdlet","Function"  # Not alias
 
@@ -68,7 +68,7 @@ foreach ($command in $commands) {
         Context "Test parameter help for $commandName" {
 
             $common = 'Debug', 'ErrorAction', 'ErrorVariable', 'InformationAction', 'InformationVariable', 'OutBuffer',
-            'OutVariable', 'PipelineVariable', 'Verbose', 'WarningAction', 'WarningVariable', 'Confirm', 'Whatif'
+            'OutVariable', 'PipelineVariable', 'Verbose', 'WarningAction', 'WarningVariable', 'Confirm', 'Whatif','ProgressAction'
 
             $parameters = $command.ParameterSets.Parameters |
             Sort-Object -Property Name -Unique |
