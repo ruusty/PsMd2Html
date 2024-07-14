@@ -76,7 +76,7 @@ Module Name: md2html
   NestedModules = @()
 
 	# Functions to export from this module
-	#FunctionsToExport = 'convertTo-mdHtml' #For performanace, list functions explicity
+	FunctionsToExport = @('Convert-Markdown2Html','Convert-Markdown2Pdf') #For performanace, list functions explicity
 
 	# Cmdlets to export from this module
 	CmdletsToExport = '*'

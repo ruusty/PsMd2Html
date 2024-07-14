@@ -27,3 +27,4 @@ Set-Alias -name md2Html -value Convert-Markdown2Html -Description "Backward comp
 Set-Alias -name md2pdf -value convert-Markdown2pdf
 
 Export-ModuleMember -Function $Public.Basename
+Export-ModuleMember -Function * -Alias *

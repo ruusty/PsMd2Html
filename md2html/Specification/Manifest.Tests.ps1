@@ -27,19 +27,19 @@ $Script:ModuleName = $Script:ModuleName = Get-ChildItem $ModuleRoot\*\*.psm1 | S
 
 Write-Verbose $('{0}:{1}' -f '$ModuleName', $ModuleName)
 
-$ModulePath = (Resolve-Path -path $(Join-Path $PSScriptRoot "..")).Path
+$ModulePath = $(Resolve-Path -path $(Join-Path $PSScriptRoot "../../Build/md2html")).Path
 Write-Verbose $('{0}:{1}' -f '$ModulePath', $ModulePath)
 
 $ManifestPath = "$ModulePath\$ModuleName.psd1"
 Write-Verbose $('{0}:{1}' -f '$ManifestPath', $ManifestPath)
 #region setup dependencies
 
-$ModuleSetup = Join-Path $PSScriptRoot "Pester.Tests.Setup.ps1"
-if (Test-Path $ModuleSetup) { . $ModuleSetup -verbose:$isVerbose }
+#$ModuleSetup = Join-Path $PSScriptRoot "Pester.Tests.Setup.ps1"
+#if (Test-Path $ModuleSetup) { . $ModuleSetup -verbose:$isVerbose }
 
 
 #Explicitly import the module for testing
-$(Get-Module $ModuleName).ExportedCommands | Sort-Object | Out-String | Write-Verbose
+#$(Get-Module $ModuleName).ExportedCommands | Sort-Object | Out-String | Write-Verbose
 
 
 # test the module manifest - exports the right functions, processes the right formats, and is generally correct

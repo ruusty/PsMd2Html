@@ -181,8 +181,8 @@ Properties {
 
 
   #Quote the elements
-  $XD = ($exDir | %{ "`"$_`"" }) -join " "
-  $XF = ($exFile | %{ "`"$_`"" }) -join " "
+  $XD = ($exDir | ForEach-Object{ "`"$_`"" }) -join " "
+  $XF = ($exFile | ForEach-Object{ "`"$_`"" }) -join " "
 
   # Quote the RoboCopy Source and Target folders
   $RoboSrc = '"{0}\md2html"' -f $ProjTopdir
@@ -202,17 +202,11 @@ Properties {
 }
 
 Task default -depends build
-Task test-build -depends Show-Settings,      clean-DryRun, unit-test, set-version, compile, compile-nupkg
-Task build      -depends Show-Settings, git-status, clean, unit-test, set-version, compile, compile-nupkg, tag-version, distribute
+Task test-build -depends Show-Settings,      clean-DryRun, set-version, compile, unit-test, compile-nupkg
+Task build      -depends Show-Settings, git-status, clean, set-version, compile, unit-test, compile-nupkg, tag-version, distribute
 
-
-
-task Compile -description "Build Deliverable zip file" -depends create-dirs, set-version   {
-  $versionNum = Get-Content $ProjVersionPath
-  $version = [system.Version]::Parse($versionNum)
-
-  Write-Verbose "Verbose is on"
-  Write-Host "Attempting to get source files"
+task Get-SourceCode -description "Get the source code to the build area"{
+ Write-Host "Attempting to get source files"
 
   $RoboArgs = @($RoboSrc, $RoboTarget, '/S', '/XD', $XD, '/XF', $XF)
   Write-Host $('Robocopy.exe {0}' -f ($RoboArgs -join " "))
@@ -264,6 +258,14 @@ task Compile -description "Build Deliverable zip file" -depends create-dirs, set
       Write-Error $innerEx
     }
   }
+}
+
+task Compile -description "Build Deliverable zip file" -depends create-dirs, set-version, Get-SourceCode  {
+  $versionNum = Get-Content $ProjVersionPath
+  $version = [system.Version]::Parse($versionNum)
+
+  Write-Verbose "Verbose is on"
+ 
 
   <#Put the History and version in the build folder.
 
@@ -281,7 +283,8 @@ task Compile -description "Build Deliverable zip file" -depends create-dirs, set
   }
 
   Write-Host "Attempting to Convert Markdown to Html"
-  Import-Module "$PSScriptRoot\md2html"
+# one and only md2html from Build path
+  Import-Module -Name $(Get-ChildItem "$PSScriptRoot\Build\md2html\md2html.psd1").Fullname -Force -verbose:$IsVerbose
   Convert-Markdown2Html -path $ProjBuildPath -recurse -verbose
 
   Write-Host "Attempting to create zip file with '$zipArgs'"

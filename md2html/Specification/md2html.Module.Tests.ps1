@@ -28,7 +28,7 @@ $ModuleSetup = Join-Path $PSScriptRoot "Pester.Tests.Setup.ps1"
  ForEach-Object{ Get-Variable -Name $_ -ErrorAction SilentlyContinue; } |Format-Table -AutoSize @{ Label = "Name"; Expression = { $_.Name }; }, @{ Label = "Value"; Expression = {(Get-Variable -Name $_.Name -EA SilentlyContinue).Value }; } | Out-String | write-verbose -verbose:$IsVerbose
 #endregion
 
-if (Test-Path $ModuleSetup) { . $ModuleSetup -verbose:$IsVerbose }
+#if (Test-Path $ModuleSetup) { . $ModuleSetup -verbose:$IsVerbose }
 
 #region setup dependencies
 
